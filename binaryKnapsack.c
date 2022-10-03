@@ -70,6 +70,7 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
 }
 
 
+
 int main(){
     int profits[] = {1,2,5,6};
     int weights[] = {2,3,4,5};
@@ -81,7 +82,6 @@ int main(){
 
     ks((int[]){5,4,3,2},(int[]){4,3,2,1},6,4, 1);
     printf("\n");
-
     ks((int[]){1,4,5,7},(int[]){1,3,4,5},7,4, 1);
     
     return 0;
