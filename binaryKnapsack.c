@@ -4,7 +4,7 @@
 // print array
 void printa(int a[], size_t size){
     for(int i = 0; i<size; i++)
-        printf("%d ",a[i]);
+        printf("%3d ",a[i]);
     printf("\n");
 }
 
@@ -12,7 +12,7 @@ void printa(int a[], size_t size){
 void printm (size_t sizei, size_t sizej, int a[sizei][sizej]){
     for(int i=0; i<sizei; i++){
         for(int j=0; j<sizej; j++){
-            printf("%d ", a[i][j]);
+            printf("%3d ", a[i][j]);
         }
         printf("\n");
     }
@@ -47,7 +47,7 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
         if(mat[i][indexWeight] != mat[i-1][indexWeight]){
             res[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;
+            indexWeight = remainingCapacity;      
         }
     }
 
@@ -69,8 +69,6 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
     printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
 }
 
-
-
 int main(){
     int profits[] = {1,2,5,6};
     int weights[] = {2,3,4,5};
@@ -84,5 +82,6 @@ int main(){
     printf("\n");
     ks((int[]){1,4,5,7},(int[]){1,3,4,5},7,4, 1);
     
+    printf("\n");
     return 0;
 }
