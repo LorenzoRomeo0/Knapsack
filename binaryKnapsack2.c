@@ -145,6 +145,7 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
 }
 
 // 0-1 knapsack with optimized columns
+// Invariant: capacity cannot be greater than the sum of all the weights
 void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
 
     // Get column values
