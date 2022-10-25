@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define DEBUG 0
+#define SHOWRESULT 0
 
 // print array
 void printa(int a[], size_t size){
@@ -145,13 +147,15 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
         printf("\n");
     }
 
-    printf("Result: ");
-    for(int i=0; i<n; i++){
-        printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
-        maxprofit += res[i]*profits[i];
+    if(SHOWRESULT){
+        printf("Result: ");
+        for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
 
+        }
+        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
     }
-    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
 }
 
 // 0-1 knapsack with optimized columns
@@ -227,12 +231,14 @@ void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
         printf("\n");
     }
 
-    printf("Result: ");
-    for(int i=0; i<n; i++){
-        printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
-        maxprofit += res[i]*profits[i];
+    if(SHOWRESULT){
+        printf("Result: ");
+        for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
+        }
+        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
     }
-    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
 }
 
 //int readVaues(char* filename, int *size, int **weights, int **profits){
@@ -281,8 +287,22 @@ int main(int argc, char *argv[]){
     int size = 0;
     readVaues(argv[1], &profits, &weights, &size);
 
+    clock_t start, end;
+    double cpu_time_used;
+    double cpu_time_used_opt;
+
+    start = clock();
     ks2(profits, weights, atoi(argv[2]), size, 0);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
+    start = clock();
+    ks2(profits, weights, atoi(argv[2]), size, 0);
+    end = clock();
+    cpu_time_used_opt = ((double) (end - start)) / CLOCKS_PER_SEC;
 
+    printf("CPU time used with standard implementation:\t%f\n", cpu_time_used);
+    printf("CPU time used with column optimization:\t\t%f\n", cpu_time_used_opt);
+    printf("CPU time gain:\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
     return 0;
 }
