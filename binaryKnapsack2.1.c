@@ -248,26 +248,20 @@ int readVaues(char* filename, int **profits, int **weights, int *size){
     int itemsNr = 0;
     read = getline(&line, &len, fp);
     sscanf(line, "%d", &itemsNr);
-    printf("items: %d\n", itemsNr);
     *size = itemsNr;
-
+    printf("items: %d\n", *size);
+    
     *profits = calloc(*size, sizeof(int));
     *weights = calloc(*size, sizeof(int));
-    printa(*profits, *size);
 
     if (fp == NULL)
         exit(EXIT_FAILURE);
     while ((read = getline(&line, &len, fp)) != -1 && itemsNr--) {
         sscanf(line, "%5d %5d %5d", &a, &b, &c);
-        printf("a.");
-        *profits[a-1] = b;
-        printf(".");
-        *weights[a-1] = c;
-        printf(".\n");
-        printf("%5d %5d %5d\n", a, b, c);
+        (*profits)[a-1] = b;
+        (*weights)[a-1] = c;
     }
 
-    //FINIRE QUI
     if (ferror(fp)) {
         printf("File error!\n");
         exit(EXIT_FAILURE);
@@ -277,7 +271,7 @@ int readVaues(char* filename, int **profits, int **weights, int *size){
 
 }
 
-int main(){
+int main(int argc, char *argv[]){
     /*
     printf("Test1\n");
     ks( (int[]){1,1,1,1},(int[]){2,3,5,7}, 17, 4, 1);
@@ -292,13 +286,19 @@ int main(){
     ks( (int[]){5,4,3,2},(int[]){4,3,2,1}, 10, 4, 1);
     ks2((int[]){5,4,3,2},(int[]){4,3,2,1}, 10, 4, 1);
     */
-
+    if(argc < 3) {
+        printf("Please specify the file containing the values and the capacity of the knapsack:\nbinaryKnapsack2a values.in 10");
+        exit(EXIT_FAILURE);
+    }
+    
     int *profits;
     int *weights;
     int size = 0;
-    readVaues("generator/files/1_10_uncorr.in", &profits, &weights, &size);
-    printf("Values: %d\n", size);
-    printa(profits, size);
-    printa(weights, size);
+    //readVaues("generator/files/1_10_uncorr.in", &profits, &weights, &size);
+    readVaues(argv[1], &profits, &weights, &size);
+
+    ks2(profits, weights, atoi(argv[2]), size, 0);
+
+
     return 0;
 }
