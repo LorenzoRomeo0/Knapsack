@@ -1,8 +1,5 @@
 #! /bin/bash
 
-#file=$1;
-#cat $file | awk '{print $1}' | sed '1d;$d'
-
 ./gen.out 10 100 1 1 1000
 mv test.in files/1_10_uncorr.in
 #cat test.in | awk '{print $1}' | sed '1d;$d' > 1_10_uncorr.in
