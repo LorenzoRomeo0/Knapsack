@@ -22,15 +22,23 @@ void printm (size_t sizei, size_t sizej, int a[sizei][sizej]){
     }
 }
 
-/* FARE DOPO ALLOC 
-void alloc(int **t, int **s, int *t_size, int *s_size, int **res_ks, int n, int capacity){
+void alloc(int **t, int **s, size_t *t_size, int *s_size, int ***table_ks, int **res_ks, int n, int capacity, int ***table_minCap){
+    // t
     *t_size = capacity+1;
     (*t) = calloc(*t_size, sizeof(int));
-    //s e s size non si possono calcolare 
 
+    // table_mincap
+    (*table_minCap) = malloc (sizeof(int[n+1][capacity+1]));
     
+    for(int i = 0; i<n+1;i++){
+        for(int j=0; j<capacity+1;j++){
+            ((int (*)[(int)(capacity+1)])*table_minCap)[i][j] = 0;
+        }
+    }
+
+    //res_ks
+    *res_ks = calloc(n, sizeof(int));
 }
-*/
 
 // Removes the redundant columns
 int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s) {
@@ -277,6 +285,7 @@ int readVaues(char* filename, int **profits, int **weights, int *size){
 }
 
 int main(int argc, char *argv[]){
+    
     if(argc < 3) {
         printf("Please specify the file containing the values and the capacity of the knapsack:\nbinaryKnapsack2a values.in 10");
         exit(EXIT_FAILURE);
@@ -304,5 +313,22 @@ int main(int argc, char *argv[]){
     printf("CPU time used with standard implementation:\t%f\n", cpu_time_used);
     printf("CPU time used with column optimization:\t\t%f\n", cpu_time_used_opt);
     printf("CPU time gain:\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
+ 
+
+   /*
+    int *t;
+    int *s;
+    size_t t_size;
+    int s_size; //??
+    int *res_ks;
+    int n = 10;
+    int capacity = 10;
+    int **table_minCap;
+    int **table_ks;
+
+    alloc(&t, &s, &t_size, &s_size, &table_ks, &res_ks, n, capacity, &table_minCap);
+    printm((size_t) n+1, (size_t) capacity+1, (int (*)[(int)(capacity+1)]) table_minCap);
+    */
+
     return 0;
 }
