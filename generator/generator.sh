@@ -1,7 +1,7 @@
 #! /bin/bash
 
-n=200
-range=100
+n=10
+range=5
 
 ./gen.out $n $range 1 1 1000
 mv test.in files/uncorr.in

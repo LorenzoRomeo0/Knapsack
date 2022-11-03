@@ -20,22 +20,13 @@ void printm (size_t sizei, size_t sizej, int a[sizei][sizej]){
     }
 }
 
-/* FARE DOPO ALLOC 
-void alloc(int **t, int **s, int *t_size, int *s_size, int **res_ks, int n, int capacity){
-    *t_size = capacity+1;
-    (*t) = calloc(*t_size, sizeof(int));
-    //s e s size non si possono calcolare 
-
-    
-}
-*/
-
 // Removes the redundant columns
-int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s) {
+int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
 
     // Compute capacity
-    int capacity = 0;
-    for(int i=0; i<n; i++) capacity+=weights[i]; 
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    capacity = (computedCapacity>capacity)?capacity:computedCapacity;
     
     *size_t = capacity+1;
 
@@ -94,6 +85,19 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s) {
 // 0-1 knapsack
 void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
     
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    if(computedCapacity<capacity){
+        int maxprofit = 0;
+        printf("Result: ");
+        for(int i=0; i<n; i++){
+            printf("(%d)%d%s", 1, i, (i+1==n)?".\n":", ");
+            maxprofit += profits[i];
+        }
+        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+        return;
+    }
+
     // Table creation
     int mat[n+1][capacity+1];
 
@@ -158,12 +162,25 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
 // Invariant: capacity cannot be greater than the sum of all the weights
 void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
 
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    if(computedCapacity<capacity){
+        int maxprofit = 0;
+        printf("Result: ");
+        for(int i=0; i<n; i++){
+            printf("(%d)%d%s", 1, i, (i+1==n)?".\n":", ");
+            maxprofit += profits[i];
+        }
+        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+        return;
+    }
+
     // Get column values
     int *t;
     int *s;
     int t_size = 0;
     int s_size = 0;
-    minCap(weights, n, &t, &t_size, &s, &s_size);
+    minCap(weights, n, &t, &t_size, &s, &s_size, capacity);
 
     // Table creation
     int mat[n+1][s_size];
@@ -216,11 +233,6 @@ void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
         for(int j = 0; j < s_size; j++) printf("%3d ", s[j]);
         printf("\n");
         for(int j = 0; j < s_size; j++) printf("%3s","_");
-        printf("\n");
-
-        for(int j = 0; j < s_size; j++){
-            printf("%3d ", s[j]);
-        }
         printf("\n");
 
         printm(n+1, s_size, mat);

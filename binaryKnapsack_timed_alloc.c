@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define DEBUG 0
-#define SHOWRESULT 0
+#define SHOWRESULT 1
 
 // print array
 void printa(int a[], size_t size){
@@ -22,15 +22,96 @@ void printm (size_t sizei, size_t sizej, int a[sizei][sizej]){
     }
 }
 
-// Removes the redundant columns
-// Removes the redundant columns
-int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
+void alloc_minCap(int **t, int *t_size, int ***table_minCap, int capacity, int n, int *weights){
 
+    *t_size = capacity+1;
+    (*t) = calloc(*t_size, sizeof(int));
+
+    (*table_minCap) = malloc (sizeof(int[n+1][capacity+1]));
+    
+    for(int i = 0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+            ((int (*)[(int)(capacity+1)])*table_minCap)[i][j] = 0;
+        }
+    }
+}
+
+void alloc_ks2(int s_size, int n, int ***table_ks, int **res_ks){
+    (*res_ks) = calloc(n, sizeof(int));
+
+    (*table_ks) = malloc (sizeof(int[n+1][s_size+1]));
+    for(int i = 0; i<n+1; i++){
+        for(int j=0; j<s_size+1; j++){
+            ((int (*)[(int)(s_size+1)])*table_ks)[i][j] = 0;
+        }
+    }
+}
+
+int minCap_a(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, int table_minCap[][capacity+1]){
     // Compute capacity
     int computedCapacity = 0;
     for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
     capacity = (computedCapacity>capacity)?capacity:computedCapacity;
     
+    // Build table
+    for(int i = 0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++) table_minCap[i][j] = capacity;
+    }
+
+    for(int i=0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : 1;
+
+            if(j == 0){
+                table_minCap[i][j] = 0;
+            }else if(i == 0){
+                table_minCap[i][j] = capacity+1;
+            } else if(j-w < 0){ 
+                table_minCap[i][j] = table_minCap[i-1][j];
+            }else if(table_minCap[i-1][j] < table_minCap[i-1][j-w]+w ){
+                table_minCap[i][j] = table_minCap[i-1][j];
+            } else{
+                table_minCap[i][j] = table_minCap[i-1][j-w]+w; 
+            }
+        }
+    }
+
+    
+    // Build result arrays
+    *s_size = 0;
+    *t_size = capacity+1;
+    for(int i=0; i<capacity+1; i++)
+        if(table_minCap[n][i] <= capacity) (*s_size)++;
+
+    if(DEBUG){
+        printf("s-size: %d\n", *s_size);
+        printf("t-size: %d\n", *t_size);
+    }
+    *t = calloc(*t_size, sizeof(int));
+    *s = calloc(*s_size, sizeof(int));
+    int counter = 0;
+    int s_cont = 0;
+    
+    for(int i=0; i<capacity+1; i++){
+        if(table_minCap[n][i] <= capacity){
+            (*t)[i] = counter++;
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+    }
+    return capacity+1;
+}
+
+// Removes the redundant columns
+int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
+
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+    
+
     *size_t = capacity+1;
 
     // Build table
@@ -88,19 +169,6 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
 // 0-1 knapsack
 void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
     
-    int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
-    if(computedCapacity<capacity){
-        int maxprofit = 0;
-        printf("Result: ");
-        for(int i=0; i<n; i++){
-            printf("(%d)%d%s", 1, i, (i+1==n)?".\n":", ");
-            maxprofit += profits[i];
-        }
-        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
-        return;
-    }
-
     // Table creation
     int mat[n+1][capacity+1];
 
@@ -152,31 +220,20 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
         printf("\n");
     }
 
-    printf("Result: ");
-    for(int i=0; i<n; i++){
-        printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
-        maxprofit += res[i]*profits[i];
+    if(SHOWRESULT){
+        printf("Result: ");
+        for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
 
+        }
+        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
     }
-    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
 }
 
 // 0-1 knapsack with optimized columns
 // Invariant: capacity cannot be greater than the sum of all the weights
 void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
-
-    int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
-    if(computedCapacity<capacity){
-        int maxprofit = 0;
-        printf("Result: ");
-        for(int i=0; i<n; i++){
-            printf("(%d)%d%s", 1, i, (i+1==n)?".\n":", ");
-            maxprofit += profits[i];
-        }
-        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
-        return;
-    }
 
     // Get column values
     int *t;
@@ -238,20 +295,95 @@ void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
         for(int j = 0; j < s_size; j++) printf("%3s","_");
         printf("\n");
 
+        for(int j = 0; j < s_size; j++){
+            printf("%3d ", s[j]);
+        }
+        printf("\n");
+
         printm(n+1, s_size, mat);
         printf("\n");
     }
 
-    printf("Result: ");
-    for(int i=0; i<n; i++){
-        printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
-        maxprofit += res[i]*profits[i];
+    if(SHOWRESULT){
+        printf("Result: ");
+        for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
+        }
+        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
     }
-    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+}
+
+void ks2_a(int *profits, int *weights, int capacity, int n, int s_size, int t_size, int *res, int *t, int *s, int mat[n+1][s_size], short showMatrix){
+    printa(t, t_size);
+    // Table creation 
+    for(int i = 0; i < n+1; i++){
+        for(int j = 0; j < s_size; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : profits[i-1];
+
+            int clm = s[j];
+            int cfr = (clm-w < 0)? -1 : (t[ clm - w ]<0) ? t[ clm - w -1 ]: t[ clm - w ];
+
+            if(i == 0 || j == 0) mat[i][j] = 0;
+            else if(cfr < 0){
+                mat[i][j] = mat[i-1][j];
+            }else if(mat[i-1][j] > mat[i-1][cfr]+p){
+                mat[i][j] = mat[i-1][j];
+           } else{
+                mat[i][j] = mat[i-1][cfr]+p; 
+            }
+        }
+    }
+
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+    for(int i=n; i>0; i--){
+        if(t[indexWeight]<0){
+            indexWeight--;
+            i++;
+            continue;
+        } 
+        if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
+            res[i-1] = 1;
+            remainingCapacity -= weights[i-1];
+            indexWeight = remainingCapacity;      
+        }
+    }
+    
+    // Result visualization
+    int maxprofit = 0;
+
+    if(showMatrix){
+        printf("matrix:\n");
+
+        for(int j = 0; j < s_size; j++) printf("%3d ", s[j]);
+        printf("\n");
+        for(int j = 0; j < s_size; j++) printf("%3s","_");
+        printf("\n");
+
+        for(int j = 0; j < s_size; j++){
+            printf("%3d ", s[j]);
+        }
+        printf("\n");
+
+        printm(n+1, s_size, mat);
+        printf("\n");
+    }
+
+    if(SHOWRESULT){
+        printf("Result: ");
+        for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
+        }
+        printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    }
 }
 
 //int readVaues(char* filename, int *size, int **weights, int **profits){
-int readVaues(char* filename, int **profits, int **weights, int *size){
+void readVaues(char* filename, int **profits, int **weights, int *size){
     FILE *fp;
     char *line = NULL;
     size_t len = 0;
@@ -301,19 +433,21 @@ int main(int argc, char *argv[]){
     double cpu_time_used;
     double cpu_time_used_opt;
 
-    start = clock();
-    ks2(profits, weights, atoi(argv[2]), size, 0);
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    int *t;
+    int t_size;
+    int *s;
+    int s_size;
+    int capacity = 30;
+    int **table_minCap;
+    int **table_ks;
+    int *res_ks;
+    
 
-    start = clock();
-    ks2(profits, weights, atoi(argv[2]), size, 0);
-    end = clock();
-    cpu_time_used_opt = ((double) (end - start)) / CLOCKS_PER_SEC;
+    alloc_minCap(&t, &t_size, &table_minCap, capacity, size, weights);
+    minCap_a(weights, size, &t, &t_size, &s, &s_size, capacity, (int (*)[(int)(capacity+1)])table_minCap);
 
-    printf("CPU time used with standard implementation:\t%f\n", cpu_time_used);
-    printf("CPU time used with column optimization:\t\t%f\n", cpu_time_used_opt);
-    printf("CPU time gain:\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
- 
+    alloc_ks2(s_size, size, &table_ks, &res_ks);
+    ks2(profits, weights, capacity, size, 0);
+    ks2_a(profits, weights, capacity, size, s_size, t_size, res_ks, t, s, (int (*)[(int)(s_size+1)])table_minCap, 0);
     return 0;
 }
