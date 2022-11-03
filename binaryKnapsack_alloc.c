@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define DEBUG 0
-#define SHOWRESULT 1
+#define SHOWRESULT 0
 
 // print array
 void printa(int a[], size_t size){
@@ -315,7 +315,6 @@ void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
 }
 
 void ks2_a(int *profits, int *weights, int capacity, int n, int s_size, int t_size, int *res, int *t, int *s, int mat[n+1][s_size], short showMatrix){
-    printa(t, t_size);
     // Table creation 
     for(int i = 0; i < n+1; i++){
         for(int j = 0; j < s_size; j++){
@@ -432,6 +431,7 @@ int main(int argc, char *argv[]){
     clock_t start, end;
     double cpu_time_used;
     double cpu_time_used_opt;
+    double cpu_time_used_alloc;
 
     int *t;
     int t_size;
@@ -446,7 +446,29 @@ int main(int argc, char *argv[]){
     minCap_a(weights, size, &t, &t_size, &s, &s_size, capacity, (int (*)[(int)(capacity+1)])table_minCap);
 
     alloc_ks2(s_size, size, &table_ks, &res_ks);
-    ks2(profits, weights, capacity, size, 0);
+    //ks2(profits, weights, capacity, size, 0);
+    //ks2_a(profits, weights, capacity, size, s_size, t_size, res_ks, t, s, (int (*)[(int)(s_size+1)])table_minCap, 0);
+
+    start = clock();
+    ks2(profits, weights, atoi(argv[2]), size, 0);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
+    ks2(profits, weights, atoi(argv[2]), size, 0);
+    end = clock();
+    cpu_time_used_opt = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
     ks2_a(profits, weights, capacity, size, s_size, t_size, res_ks, t, s, (int (*)[(int)(s_size+1)])table_minCap, 0);
+    end = clock();
+    cpu_time_used_alloc = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    printf("CPU time used with standard implementation:\t\t\t\t\t\t%f\n", cpu_time_used);
+    printf("CPU time used with column optimization:\t\t\t\t\t\t\t%f\n", cpu_time_used_opt);
+    printf("CPU time used with column optimization and early allocation:\t%f\n", cpu_time_used_alloc);
+    printf("CPU time gain:\t\t\t\t\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
+    printf("CPU time gain with early allocation:\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_alloc);
+ 
     return 0;
 }
