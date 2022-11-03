@@ -442,7 +442,6 @@ int main(int argc, char *argv[]){
     int **table_ks;
     int *res_ks;
     
-
     alloc_minCap(&t, &t_size, &table_minCap, capacity, size, weights);
     minCap_a(weights, size, &t, &t_size, &s, &s_size, capacity, (int (*)[(int)(capacity+1)])table_minCap);
 
