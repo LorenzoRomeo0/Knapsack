@@ -450,7 +450,7 @@ int main(int argc, char *argv[]){
     //ks2_a(profits, weights, capacity, size, s_size, t_size, res_ks, t, s, (int (*)[(int)(s_size+1)])table_minCap, 0);
 
     start = clock();
-    ks2(profits, weights, atoi(argv[2]), size, 0);
+    ks(profits, weights, atoi(argv[2]), size, 0);
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
