@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define DEBUG 0
-#define SHOWRESULT 0
+//#define SHOWRESULT
 
 // print array
 void printa(int a[], size_t size){
@@ -152,6 +152,7 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
         printf("\n");
     }
 
+#ifdef SHOWRESULT
     printf("Result: ");
     for(int i=0; i<n; i++){
         printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
@@ -159,6 +160,7 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
 
     }
     printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+#endif
 }
 
 // 0-1 knapsack with optimized columns
@@ -242,12 +244,14 @@ void ks2(int *profits, int *weights, int capacity, int n, short showMatrix){
         printf("\n");
     }
 
+#ifdef SHOWRESULT
     printf("Result: ");
     for(int i=0; i<n; i++){
         printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
         maxprofit += res[i]*profits[i];
     }
     printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+#endif
 }
 
 //int readVaues(char* filename, int *size, int **weights, int **profits){

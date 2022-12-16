@@ -1,7 +1,8 @@
 #! /bin/bash
 
-n=10
-range=5
+n=100
+range=20
+
 
 ./gen.out $n $range 1 1 1000
 mv test.in files/uncorr
@@ -25,8 +26,11 @@ mv test.in files/alm_str_corr
 ./derived_instance_generator files/alm_str_corr 100
 
 rm files/derived/*
-files=$(find files -name '*[[:digit:]]')
-mv $files files/derived
+cd files
+files=$(find . -maxdepth 1 -name '*[[:digit:]]')
+mv $files derived
+cd ..
+
 
 exit
 #cat test.in | awk '{print $1}' | sed '1d;$d' > 1_10_uncorr.in
