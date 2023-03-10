@@ -1,15 +1,21 @@
 #! /bin/bash
 
-capacity=200
+#capacity=30
+capacity=500
+#capacity=20000
+#capacity=10300 #massimo senza segfault
 
-#gcc binaryKnapsack.c -o binaryKnapsack
+#gcc binaryKnapsack.c -o binaryKnapsack && ./binaryKnapsack
 #gcc binaryKnapsack2.c -o binaryKnapsack
 #gcc binaryKnapsack2.1.c -o binaryKnapsack
 #gcc binaryKnapsack_alloc.c -o binaryKnapsack
 #gcc binaryKnapsack_timed.c -o binaryKnapsack
 #gcc binaryKnapsack3.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack
-gcc binaryKnapsack3.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm
+#gcc binaryKnapsack3.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm
+gcc binaryKnapsack3_test.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm
+
 #gcc binaryKnapsack3_test.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && binaryKnapsack "generator/files/str_corr" 200 "generator/files/derived/int/str_corr"
+#gcc binaryKnapsack4.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ./generator/files/derived/int/ 100 > testing.txt
 
 run(){
   for i in generator/files/derived/*; do

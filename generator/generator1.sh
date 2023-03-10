@@ -3,7 +3,8 @@
 gcc derived_instance_generator_int.c -o derived_instance_generator_int -lm
 
 n=100
-range=20
+#range=20
+range=1000
 
 ./gen.out $n $range 1 1 1000
 mv test.in files/uncorr

@@ -249,7 +249,7 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
     for(int i = 0; i<n+1;i++)
         for(int j=0;j<capacity+1;j++) mat[i][j] = 0;
 
-    for(int i=0; i<n+1; i++){
+    for(int i=0; i < n+1; i++){
         for(int j=0; j<capacity+1; j++){
             int w = (i == 0)? 0 : weights[i-1];
             int p = (i == 0)? 0 : profits[i-1];
@@ -943,6 +943,7 @@ void main(int argc, char *argv[]){
     clock_t start, end;
     double cpu_time_used;
     double cpu_time_used_opt;
+    double cpu_time_used_to_alloc;
     double cpu_time_used_alloc;
     double cpu_time_used_fminknap;
 
@@ -956,7 +957,6 @@ void main(int argc, char *argv[]){
     
     int *x1 = calloc(n, sizeof(int));
     
-
     start = clock();
     ks_d(profits, weights, capacity, n, x1);
     end = clock();
@@ -965,11 +965,17 @@ void main(int argc, char *argv[]){
     #ifdef SHOWRES
     printa(x1, n);
     #endif
-    
+
+    double resv1 = 0;
+    for(int i=0; i<n; i++){
+        resv1 += x1[i]*profits[i];
+    }
+    printf("resv1 ks:\t\t%10lf\n", resv1);
 
     // V2 ----
     
     int *x2 = calloc(n, sizeof(int));
+
     start = clock();
     ks2_d(profits, weights, capacity, n, x2);
     end = clock();
@@ -978,6 +984,12 @@ void main(int argc, char *argv[]){
     #ifdef SHOWRES
     printa(x2, n);
     #endif
+
+    double resv2 = 0;
+    for(int i=0; i<n; i++){
+        resv2 += x2[i]*profits[i];
+    }
+    printf("rev2 ks:\t\t%10lf\n", resv2);
 
     // V3 ----
     
@@ -989,9 +1001,12 @@ void main(int argc, char *argv[]){
     double **table_ks;
     int *x3 = calloc(n, sizeof(int));
 
+    start = clock();
     alloc_minCap_d(&t, &t_size, &table_minCap, capacity, n, weights);
     minCap_a_d(weights, n, &t, &t_size, &s, &s_size, capacity, (double (*)[(int)(capacity+1)])table_minCap);
     alloc_ks2_d(s_size, n, &table_ks);
+    end = clock();
+    cpu_time_used_to_alloc = ((double) (end - start)) / CLOCKS_PER_SEC;
 
     start = clock();
     ks2_a_d(profits, weights, capacity, n, s_size, t_size, t, s, (double (*)[(int)(s_size+1)])table_minCap, x3);
@@ -1006,13 +1021,13 @@ void main(int argc, char *argv[]){
     for(int i=0; i<n; i++){
         res1 += x3[i]*profits[i];
     }
-    //printf("res1: %10lf\n", res1);
+    printf("res ks:\t\t\t%10lf\n", res1);
 
     // FMINKNAP ----
     itype *p_fminknap;              //profitti
     itype *w_fminknap;              //pesi 
     int *x;                         //solution vector
-    SolutionList *s_list;           //boh
+    SolutionList *s_list;           
     int z = 0;                      //optimal objective value
 
     x = calloc(n, sizeof(int));
@@ -1035,17 +1050,18 @@ void main(int argc, char *argv[]){
     for(int i=0; i<n; i++){
         res2 += x[i]*profits[i];
     }
-    //printf("res2: %10lf\n", res2);
+    printf("res fminknap:\t%10lf\n", res2);
    
     // RESULTS ----
 
     printf("CPU time used with standard implementation:\t\t\t\t\t\t%f\n", cpu_time_used);
     printf("CPU time used with column optimization:\t\t\t\t\t\t\t%f\n", cpu_time_used_opt);
     printf("CPU time used with column optimization and early allocation:\t%f\n", cpu_time_used_alloc);
+    printf("CPU time used with to allocate:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used_to_alloc);
     printf("CPU time used with fminknap:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used_fminknap);
     printf("CPU time gain with column opt:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
     printf("CPU time gain with early allocation:\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_alloc);
-    printf("Difference between fminknap:\t\t\t\t\t\t\t\t\t%f\n", 1-(res1/res2));
+    printf("Difference between fminknap and ks:\t\t\t\t\t\t\t\t%f\n", ((res2>res1)?res2-res1:res1-res2));
 
 }
 

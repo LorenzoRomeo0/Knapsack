@@ -11,7 +11,7 @@ typedef unsigned long btype;   /* binary representation of solution */
 #define PISINGER_EPSILON 1E-9 /*1E-12*/
 
 /* Returns a dual bound instead of the solution value */
-#define RETURN_DUAL_BOUND
+//#define RETURN_DUAL_BOUND
 
 /* Skips remotion of items with negative price and
    test for the trivial solutions (all variables to 0 and all variables to 1) */

@@ -1,0 +1,35 @@
+generator/files/alm_str_corr.in
+CPU time used with standard implementation:						0.000006
+CPU time used with column optimization:							0.000005
+CPU time used with column optimization and early allocation:	0.000003
+CPU time gain:													0.000001
+CPU time gain with early allocation:							0.000003
+
+generator/files/inv_str_corr.in
+CPU time used with standard implementation:						0.000008
+CPU time used with column optimization:							0.000007
+CPU time used with column optimization and early allocation:	0.000004
+CPU time gain:													0.000001
+CPU time gain with early allocation:							0.000004
+
+generator/files/str_corr.in
+CPU time used with standard implementation:						0.000009
+CPU time used with column optimization:							0.000007
+CPU time used with column optimization and early allocation:	0.000003
+CPU time gain:													0.000002
+CPU time gain with early allocation:							0.000006
+
+generator/files/uncorr.in
+CPU time used with standard implementation:						0.000006
+CPU time used with column optimization:							0.000005
+CPU time used with column optimization and early allocation:	0.000002
+CPU time gain:													0.000001
+CPU time gain with early allocation:							0.000004
+
+generator/files/weak_corr.in
+CPU time used with standard implementation:						0.000005
+CPU time used with column optimization:							0.000004
+CPU time used with column optimization and early allocation:	0.000002
+CPU time gain:													0.000001
+CPU time gain with early allocation:							0.000003
+

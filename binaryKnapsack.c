@@ -69,6 +69,69 @@ void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
     printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
 }
 
+// 0-1 knapsack con ottimizzazione della memoria
+// void ks(int *profits, int *weights, int capacity, int n, short showMatrix){
+//     // Table creation
+//     int mat[n+1][capacity+1];
+//     int *res = calloc(n, sizeof(int));
+    
+//     int c1[n+1];
+//     int c2[n+1];
+
+//     int *prev = c2;
+//     int *current = c1;
+//     int *aux;
+
+//     for(int i = 0; i<n+1;i++) c1[i] = 0;
+//     for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+//     for(int i=0; i<n+1; i++){
+//         for(int j=0; j<capacity+1; j++){
+//             int w = (i == 0)? 0 : weights[i-1];
+//             int p = (i == 0)? 0 : profits[i-1];
+//             if(i == 0 || j == 0) current[j] = 0;
+//             else if(prev[j] > prev[j-w]+p || j-w<0)
+//                 current[j] = prev[j];
+//             else
+//                 current[j] = prev[j-w]+p; 
+//         }
+//         aux = current;
+//         current = prev;
+//         prev = aux;
+//     }
+
+//     // Result search
+    
+//     int remainingCapacity = capacity;
+//     int indexWeight = capacity;
+
+//     for(int i=n; i>0; i--){
+//         if(mat[i][indexWeight] != mat[i-1][indexWeight]){
+//             res[i-1] = 1;
+//             remainingCapacity -= weights[i-1];
+//             indexWeight = remainingCapacity;      
+//         }
+//     }
+
+//     // Result visualization
+//     int maxprofit = 0;
+
+//     if(showMatrix){
+//         printf("matrix:\n");
+//         printm(n+1, capacity+1, mat);
+//         printf("\n");
+//     }
+
+//     printf("Result: ");
+//     for(int i=0; i<n; i++){
+//         printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+//         maxprofit += res[i]*profits[i];
+
+//     }
+//     printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+// }
+
+
 int main(){
     int profits[] = {1,2,5,6};
     int weights[] = {2,3,4,5};

@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <fminknap_npg.h>
 #include <time.h>
-
+#include <math.h>
 //#define SHOWRES
-//#define SHOWMAT
+#define SHOWMAT
 
 
 /* ======================================================================
 				  utils
    ====================================================================== */
+
 
 void printa(int a[], size_t size){
     /* print array */
@@ -25,12 +26,6 @@ void printa_d(double a[], size_t size){
     printf("\n");
 }
 
-
-void printitypea(itype a[], size_t size){
-    for(int i = 0; i<size; i++)
-        printf("%3f ",a[i]);
-    printf("\n");
-}
 
 int readValues(char* filename, int **profits, int **weights, int *size){
     FILE *fp;
@@ -64,41 +59,6 @@ int readValues(char* filename, int **profits, int **weights, int *size){
     free(line);
     fclose(fp);
 
-}
-
-int readValues_d_i(char* filename, double **profits, int **weights, int *size){
-    FILE *fp;
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    fp = fopen(filename, "r");
-    itype b = 0;
-    int a=0, c=0;
-
-    // Read items nr
-    int itemsNr = 0;
-    read = getline(&line, &len, fp);
-    
-    sscanf(line, "%d", &itemsNr);
-    *size = itemsNr;
-    
-    *profits = calloc(*size, sizeof(itype));
-    *weights = calloc(*size, sizeof(int));
-    
-    if (fp == NULL)
-        exit(EXIT_FAILURE);
-    while ((read = getline(&line, &len, fp)) != -1 && itemsNr--) {
-        sscanf(line, "%5d %lf %5d", &a, &b, &c);
-        (*profits)[a-1] = b;
-        (*weights)[a-1] = c; 
-    }
-
-    if (ferror(fp)) {
-        printf("File error!\n");
-        exit(EXIT_FAILURE);
-    }
-    free(line);
-    fclose(fp);
 }
 
 int readitypeValues(char* filename, itype **profits, itype **weights, int *size){
@@ -136,6 +96,42 @@ int readitypeValues(char* filename, itype **profits, itype **weights, int *size)
     free(line);
     fclose(fp);
 }
+
+int readValues_d_i(char* filename, double **profits, int **weights, int *size){
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    fp = fopen(filename, "r");
+    itype b = 0;
+    int a=0, c=0;
+
+    // Read items nr
+    int itemsNr = 0;
+    read = getline(&line, &len, fp);
+    
+    sscanf(line, "%d", &itemsNr);
+    *size = itemsNr;
+    
+    *profits = calloc(*size, sizeof(itype));
+    *weights = calloc(*size, sizeof(int));
+    
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+    while ((read = getline(&line, &len, fp)) != -1 && itemsNr--) {
+        sscanf(line, "%5d %lf %5d", &a, &b, &c);
+        (*profits)[a-1] = b;
+        (*weights)[a-1] = c; 
+    }
+
+    if (ferror(fp)) {
+        printf("File error!\n");
+        exit(EXIT_FAILURE);
+    }
+    free(line);
+    fclose(fp);
+}
+
 
 void printm (size_t sizei, size_t sizej, int a[sizei][sizej]){
     /* print matrix */
@@ -253,7 +249,7 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
     for(int i = 0; i<n+1;i++)
         for(int j=0;j<capacity+1;j++) mat[i][j] = 0;
 
-    for(int i=0; i<n+1; i++){
+    for(int i=0; i < n+1; i++){
         for(int j=0; j<capacity+1; j++){
             int w = (i == 0)? 0 : weights[i-1];
             int p = (i == 0)? 0 : profits[i-1];
@@ -309,6 +305,72 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
     */
 }
 
+void ks_d_opt(double *profits, int *weights, int capacity, int n, int* x){
+    /*  0-1 knapsack con l'ottimizzazione della memoria*/
+
+    // Trivial solution
+    int sumWeights = 0;
+    for(int i=0; i<n; i++) sumWeights+=weights[i];
+    if(capacity >= sumWeights){
+        for(int i=0; i<n; i++) x[i] = 1;
+        return;
+    }
+
+    // Table creation
+    double c1[n+1];
+    double c2[n+1];
+
+    double *prev = c2;
+    double *current = c1;
+    double *aux;
+
+    for(int i = 0; i<n+1;i++) c1[i] = 0;
+    for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+    for(int i=0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : profits[i-1];
+
+            if(i == 0 || j == 0) current[j] = 0;
+            else if(prev[j] > prev[j-w]+p || j-w<0)
+                current[j] = prev[j];
+            else
+                current[j] = prev[j-w]+p; 
+        }
+        aux = current;
+        current = prev;
+        prev = aux;
+    }
+    
+
+    // Result search
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+
+    // for(int i=n; i>0; i--){
+    //     if(mat[i][indexWeight] != mat[i-1][indexWeight]){
+    //         x[i-1] = 1;
+    //         remainingCapacity -= weights[i-1];
+    //         indexWeight = remainingCapacity;      
+    //     }
+    // }
+
+    // Result visualization
+
+    /*
+    #ifdef SHOWRES
+    printf("Result: ");
+    for(int i=0; i<n; i++){
+            printf("(%d)%d%s", x[i], i, (i+1==n)?".\n":", ");
+            maxprofit += x[i]*profits[i];
+
+        }
+    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    #endif
+    */
+}
 /* ---------------------------------------------------------------------- */
 
 /* ======================================================================
@@ -321,11 +383,10 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
     capacity = (computedCapacity>capacity)?capacity:computedCapacity;
     
-
     *size_t = capacity+1;
 
     // Build table
-    double mat[n+1][capacity+1];
+    int mat[n+1][capacity+1];
 
     for(int i = 0; i<n+1;i++)
         for(int j=0;j<capacity+1;j++) mat[i][j] = capacity;
@@ -361,6 +422,9 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     int counter = 0;
     int s_cont = 0;
     
+    //print matrix
+    
+
     for(int i=0; i<capacity+1; i++){
         if(mat[n][i] <= capacity){
             (*t)[i] = counter++;
@@ -372,8 +436,7 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     return capacity+1;
 }
 
-// Removes the redundant columns
-int minCap_d(double *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
+int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
 
     int computedCapacity = 0;
     for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
@@ -383,11 +446,79 @@ int minCap_d(double *weights, int n, int **t, int *size_t, int **s, int *size_s,
     *size_t = capacity+1;
 
     // Build table
-    double mat[n+1][capacity+1];
+    int mat[n+1][capacity+1];
+
+    int c1[capacity+1];
+    int c2[capacity+1];
+
+    int *prev = c2;
+    int *current = c1;
+    int *aux;
+
+    for(int i = 0; i<n+1;i++) c1[i] = 0;
+    for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+    for(int i=0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : 1;
+
+            if(j == 0){
+                current[j] = 0;
+            }else if(i == 0){
+                current[j] = capacity+1;
+            } else if(j-w < 0){ 
+                current[j] = prev[j];
+            }else if(prev[j] < current[j-w]+w ){
+                current[j] = prev[j];
+            } else{
+                current[j] = prev[j-w]+w; 
+            }
+        }
+        aux = current;
+        current = prev;
+        prev = aux;
+    }
+
+    // Build result arrays
+    *size_s = 0;
+    for(int i=0; i<capacity+1; i++)
+        if(prev[i] <= capacity) (*size_s)++;
+
+    *t = calloc(*size_t, sizeof(int));
+    *s = calloc(*size_s, sizeof(int));
+    int counter = 0;
+    int s_cont = 0;
+    
+    for(int i=0; i<capacity+1; i++){
+        if(prev[i] <= capacity){
+            (*t)[i] = counter++;
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+    }
+    return capacity+1;
+}
+
+
+/*
+// Removes the redundant columns
+int minCap_d(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
+
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+    
+
+    *size_t = capacity+1;
+
+    // Build table
+    int mat[n+1][capacity+1];
 
     for(int i = 0; i<n+1;i++)
         for(int j=0;j<capacity+1;j++) mat[i][j] = capacity;
-
 
     for(int i=0; i<n+1; i++){
         for(int j=0; j<capacity+1; j++){
@@ -429,6 +560,7 @@ int minCap_d(double *weights, int n, int **t, int *size_t, int **s, int *size_s,
     }
     return capacity+1;
 }
+*/
 
 // 0-1 knapsack with optimized columns
 // Invariant: capacity cannot be greater than the sum of all the weights
@@ -474,7 +606,6 @@ void ks2(int *profits, int *weights, int capacity, int n, int* x){
         }
     }
 
-    //int *res = calloc(n, sizeof(int));
     int remainingCapacity = capacity;
     int indexWeight = capacity;
 
@@ -493,7 +624,6 @@ void ks2(int *profits, int *weights, int capacity, int n, int* x){
     
     // Result visualization
     
-
     #ifdef SHOWMAT
         printf("matrix:\n");
 
@@ -524,7 +654,7 @@ void ks2(int *profits, int *weights, int capacity, int n, int* x){
     */
 }
 
-void ks2_d(double *profits, double *weights, int capacity, int n, int* x){
+void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
 
     // trivial solution
     int sumWeights = 0;
@@ -537,16 +667,16 @@ void ks2_d(double *profits, double *weights, int capacity, int n, int* x){
     // Get column values
     int *t;
     int *s;
-    int t_size = 0;
-    int s_size = 0;
-    minCap_d(weights, n, &t, &t_size, &s, &s_size, capacity);
+    int t_size;
+    int s_size;
+    minCap(weights, n, &t, &t_size, &s, &s_size, capacity);
 
     // Table creation
     double mat[n+1][s_size];
 
     for(int i = 0; i<n+1; i++)
         for(int j=0; j<s_size; j++) mat[i][j] = 0;
-        
+    
     for(int i = 0; i < n+1; i++){
         for(int j = 0; j < s_size; j++){
             int w = (i == 0)? 0 : weights[i-1];
@@ -577,6 +707,7 @@ void ks2_d(double *profits, double *weights, int capacity, int n, int* x){
             continue;
         } 
         if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
+            //printf("i = %d, indexwe = %d, t = %d\n", i, indexWeight, t[indexWeight]);
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
             indexWeight = remainingCapacity;      
@@ -584,18 +715,111 @@ void ks2_d(double *profits, double *weights, int capacity, int n, int* x){
     }
     
     // Result visualization
-    
 
     #ifdef SHOWMAT
         printf("matrix:\n");
 
-        for(int j = 0; j < s_size; j++) printf("%3d ", s[j]);
+        for(int j = 0; j < s_size; j++) printf("%9d ", s[j]);
         printf("\n");
         for(int j = 0; j < s_size; j++) printf("%3s","_");
         printf("\n");
 
         for(int j = 0; j < s_size; j++){
-            printf("%3d ", s[j]);
+            printf("%8d ", s[j]);
+        }
+        printf("\n");
+
+        printm_d(n+1, s_size, mat);
+        printf("\n");
+    #endif
+
+    /*
+    #ifdef SHOWRES
+    int maxprofit = 0;
+    printf("Result: ");
+    for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
+        }
+    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    #endif
+    */
+}
+
+void ks2_d_opt(double *profits, int *weights, int capacity, int n, int* x){
+
+    printf("s_sisssze\n");
+    // trivial solution
+    int sumWeights = 0;
+    for(int i=0; i<n; i++) sumWeights+=weights[i];
+    if(capacity >= sumWeights){
+        for(int i=0; i<n; i++) x[i] = 1;
+        return;
+    }
+
+    // Get column values
+    int *t;
+    int *s;
+    int t_size;
+    int s_size;
+    minCap_opt(weights, n, &t, &t_size, &s, &s_size, capacity);
+
+    printf("s size = %d\n", s_size);
+    // Table creation
+    double mat[n+1][s_size];
+
+    for(int i = 0; i<n+1; i++)
+        for(int j=0; j<s_size; j++) mat[i][j] = 0;
+    
+    for(int i = 0; i < n+1; i++){
+        for(int j = 0; j < s_size; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : profits[i-1];
+
+            int clm = s[j];
+            int cfr = (clm-w < 0)? -1 : (t[ clm - w ]<0) ? t[ clm - w -1 ]: t[ clm - w ];
+
+            if(i == 0 || j == 0) mat[i][j] = 0;
+            else if(cfr < 0){
+                mat[i][j] = mat[i-1][j];
+            }else if(mat[i-1][j] > mat[i-1][cfr]+p){
+                mat[i][j] = mat[i-1][j];
+           } else{
+                mat[i][j] = mat[i-1][cfr]+p; 
+            }
+        }
+    }
+
+    //int *res = calloc(n, sizeof(int));
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+    for(int i=n; i>0; i--){
+        if(t[indexWeight]<0){
+            indexWeight--;
+            i++;
+            continue;
+        } 
+        if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
+            printf("i = %d, indexwe = %d, t = %d\n", i, indexWeight, t[indexWeight]);
+            x[i-1] = 1;
+            remainingCapacity -= weights[i-1];
+            indexWeight = remainingCapacity;      
+        }
+    }
+    
+    // Result visualization
+
+    #ifdef SHOWMAT
+        printf("matrix:\n");
+
+        for(int j = 0; j < s_size; j++) printf("%9d ", s[j]);
+        printf("\n");
+        for(int j = 0; j < s_size; j++) printf("%3s","_");
+        printf("\n");
+
+        for(int j = 0; j < s_size; j++){
+            printf("%8d ", s[j]);
         }
         printf("\n");
 
@@ -776,8 +1000,7 @@ void ks2_a(int *profits, int *weights, int capacity, int n, int s_size, int t_si
     */
 }
 
-
-void alloc_minCap_d(int **t, int *t_size, double ***table_minCap, int capacity, int n, double *weights){
+void alloc_minCap_d(int **t, int *t_size, double ***table_minCap, int capacity, int n, int *weights){
 
     *t_size = capacity+1;
     (*t) = calloc(*t_size, sizeof(int));
@@ -801,7 +1024,7 @@ void alloc_ks2_d(int s_size, int n, double ***table_ks){
     }
 }
 
-int minCap_a_d(double *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, double table_minCap[][capacity+1]){
+int minCap_a_d(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, double table_minCap[][capacity+1]){
     // Compute capacity
     int computedCapacity = 0;
     for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
@@ -854,7 +1077,7 @@ int minCap_a_d(double *weights, int n, int **t, int *t_size, int **s, int *s_siz
     return capacity+1;
 }
 
-void ks2_a_d(double *profits, double *weights, int capacity, int n, int s_size, int t_size, int *t, int *s, double mat[n+1][s_size], int* x){
+void ks2_a_d(double *profits, int *weights, int capacity, int n, int s_size, int t_size, int *t, int *s, double mat[n+1][s_size], int* x){
     
     // trivial solution
     int sumWeights = 0;
@@ -901,9 +1124,10 @@ void ks2_a_d(double *profits, double *weights, int capacity, int n, int s_size, 
     }
     
     // Result visualization
-    int maxprofit = 0;
+    
 
     #ifdef SHOWMAT  
+    int maxprofit = 0;
     printf("matrix:\n");
 
     for(int j = 0; j < s_size; j++) printf("%10d ", s[j]);
@@ -931,6 +1155,73 @@ void ks2_a_d(double *profits, double *weights, int capacity, int n, int s_size, 
     */
 }
 
+/* ---------------------------------------------------------------------- */
+
+/* ======================================================================
+				  binary knapsack v3 with value division
+   ====================================================================== */
+
+// divido i pesi per 10
+int minCap_a_d_10(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, double table_minCap[][capacity+1]){
+    // Compute capacity
+
+    for(int i=0; i<n; i++){
+        weights[i] = ceil(weights[i]/10);
+    }
+
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+    
+    
+
+    // Build table
+    for(int i = 0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++) table_minCap[i][j] = capacity;
+    }
+
+    for(int i=0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : 1;
+
+            if(j == 0){
+                table_minCap[i][j] = 0;
+            }else if(i == 0){
+                table_minCap[i][j] = capacity+1;
+            } else if(j-w < 0){ 
+                table_minCap[i][j] = table_minCap[i-1][j];
+            }else if(table_minCap[i-1][j] < table_minCap[i-1][j-w]+w ){
+                table_minCap[i][j] = table_minCap[i-1][j];
+            } else{
+                table_minCap[i][j] = table_minCap[i-1][j-w]+w; 
+            }
+        }
+    }
+
+    
+    // Build result arrays
+    *s_size = 0;
+    *t_size = capacity+1;
+    for(int i=0; i<capacity+1; i++)
+        if(table_minCap[n][i] <= capacity) (*s_size)++;
+
+    *t = calloc(*t_size, sizeof(double));
+    *s = calloc(*s_size, sizeof(double));
+    int counter = 0;
+    int s_cont = 0;
+    
+    for(int i=0; i<capacity+1; i++){
+        if(table_minCap[n][i] <= capacity){
+            (*t)[i] = counter++;
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+    }
+    return capacity+1;
+}
+
 
 /* ---------------------------------------------------------------------- */
 
@@ -938,70 +1229,210 @@ void ks2_a_d(double *profits, double *weights, int capacity, int n, int s_size, 
 				  Main
    ====================================================================== */
 
-/*
-void main(int argc, char *argv[]){
+void main2(int argc, char *argv[]){
+    if(argc < 3) {
+        printf("Please specify the file containing the values and the capacity of the knapsack:\nbinaryKnapsack2a values.in 10");
+        exit(EXIT_FAILURE);
+    }
+    int capacity = atoi(argv[2]);       //capacità
+    //int n = 0;                        //numero elementi
+
+    clock_t start, end;
+    double cpu_time_used;
+    double cpu_time_used_opt;
+    double cpu_time_used_to_alloc;
+    double cpu_time_used_alloc;
+    double cpu_time_used_fminknap;
+
+    // BINARYKNAPSACK
+    double *profits;               
+    int *weights;
+    int n = 0;
+    readValues_d_i(argv[1], &profits, &weights, &n);
+
+    
+    // V1 ----
+    
+    int *x1 = calloc(n, sizeof(int));
+    
+    start = clock();
+    ks_d(profits, weights, capacity, n, x1);
+
+    #ifdef SHOWRES
+    printa(x1, n);
+    #endif
+
+    double resv1 = 0;
+    for(int i=0; i<n; i++){
+        resv1 += x1[i]*profits[i];
+    }
+    printf("resv1 ks:\t\t%10lf\n", resv1);
+
+    // V2 ----
+    
+    int *x2 = calloc(n, sizeof(int));
+
+    start = clock();
+    ks2_d(profits, weights, capacity, n, x2);
+    
+    #ifdef SHOWRES
+    printa(x2, n);
+    #endif
+
+    double resv2 = 0;
+    for(int i=0; i<n; i++){
+        resv2 += x2[i]*profits[i];
+    }
+    printf("rev2 ks:\t\t%10lf\n", resv2);
+
+    // V3 ----
+    
+    int *t;
+    int t_size;
+    int *s;
+    int s_size;
+    double **table_minCap;
+    double **table_ks;
+    int *x3 = calloc(n, sizeof(int));
+
+    start = clock();
+    alloc_minCap_d(&t, &t_size, &table_minCap, capacity, n, weights);
+    minCap_a_d(weights, n, &t, &t_size, &s, &s_size, capacity, (double (*)[(int)(capacity+1)])table_minCap);
+    //minCap_a_d_10(weights, n, &t, &t_size, &s, &s_size, capacity, (double (*)[(int)(capacity+1)])table_minCap);
+    alloc_ks2_d(s_size, n, &table_ks);
+
+    start = clock();
+    ks2_a_d(profits, weights, capacity, n, s_size, t_size, t, s, (double (*)[(int)(s_size+1)])table_minCap, x3);
+    
+    #ifdef SHOWRES
+    printa(x3, n);
+    #endif
+
+    double res1 = 0;
+    for(int i=0; i<n; i++){
+        res1 += x3[i]*profits[i];
+    }
+    printf("res ks:\t\t\t%10lf\n", res1);
+
+    // FMINKNAP ----
+    itype *p_fminknap;              //profitti
+    itype *w_fminknap;              //pesi 
+    int *x;                         //solution vector
+    SolutionList *s_list;           
+    int z = 0;                      //optimal objective value
+
+    x = calloc(n, sizeof(int));
+    readitypeValues(argv[1], &p_fminknap, &w_fminknap, &n);
+
+    openPisinger(n);
+
+    start = clock();
+    minknap(&s_list, n, p_fminknap, w_fminknap, x, capacity);
+
+    #ifdef SHOWRES
+    printa(x, n);
+    #endif
+
+    closePisinger();
+
+    double res2 = 0;
+    for(int i=0; i<n; i++){
+        res2 += x[i]*profits[i];
+    }
+    printf("res fminknap:\t%10lf\n", res2);
+   
+    // RESULTS ----
+
+    printf("CPU time used with standard implementation:\t\t\t\t\t\t%f\n", cpu_time_used);
+    printf("CPU time used with column optimization:\t\t\t\t\t\t\t%f\n", cpu_time_used_opt);
+    printf("CPU time used with column optimization and early allocation:\t%f\n", cpu_time_used_alloc);
+    printf("CPU time used with to allocate:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used_to_alloc);
+    printf("CPU time used with fminknap:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used_fminknap);
+    printf("CPU time gain with column opt:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
+    printf("CPU time gain with early allocation:\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_alloc);
+    printf("Difference between fminknap and ks:\t\t\t\t\t\t\t\t%f\n", ((res2>res1)?res2-res1:res1-res2));
+
+}
+
+void main1(int argc, char *argv[]){
     if(argc < 3) {
         printf("Please specify the file containing the values and the capacity of the knapsack:\nbinaryKnapsack2a values.in 10");
         exit(EXIT_FAILURE);
     }
     
     int capacity = atoi(argv[2]);       //capacità
+    //int n = 0;                        //numero elementi
 
     clock_t start, end;
     double cpu_time_used;
     double cpu_time_used_opt;
+    double cpu_time_used_to_alloc;
     double cpu_time_used_alloc;
     double cpu_time_used_fminknap;
 
     // BINARYKNAPSACK
-    int *profits;               
+    double *profits;               
     int *weights;
     int n = 0;
-    readValues(argv[1], &profits, &weights, &n);
+    readValues_d_i(argv[1], &profits, &weights, &n);
 
-    // V1
+    // V1 ----
     
     int *x1 = calloc(n, sizeof(int));
     
-
     start = clock();
-    ks(profits, weights, capacity, n, x1);
+    ks_d(profits, weights, capacity, n, x1);
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
     #ifdef SHOWRES
     printa(x1, n);
     #endif
-    
-    // --
 
-    // V2
-    start = clock();
+    double resv1 = 0;
+    for(int i=0; i<n; i++){
+        resv1 += x1[i]*profits[i];
+    }
+    printf("resv1 ks:\t\t%10lf\n", resv1);
+
+    // V2 ----
+    
     int *x2 = calloc(n, sizeof(int));
-    ks2(profits, weights, capacity, n, x2);
+
+    start = clock();
+    ks2_d_opt(profits, weights, capacity, n, x2);
     end = clock();
     cpu_time_used_opt = ((double) (end - start)) / CLOCKS_PER_SEC;
     
     #ifdef SHOWRES
     printa(x2, n);
     #endif
-    // --
 
-    // V3
+    double resv2 = 0;
+    for(int i=0; i<n; i++){
+        resv2 += x2[i]*profits[i];
+    }
+    printf("rev2 ks:\t\t%10lf\n", resv2);
+
+    // V3 ----
     
     int *t;
     int t_size;
     int *s;
     int s_size;
-    int **table_minCap;
-    int **table_ks;
+    double **table_minCap;
+    double **table_ks;
     int *x3 = calloc(n, sizeof(int));
-    alloc_minCap(&t, &t_size, &table_minCap, capacity, n, weights);
-    minCap_a(weights, n, &t, &t_size, &s, &s_size, capacity, (int (*)[(int)(capacity+1)])table_minCap);
-    alloc_ks2(s_size, n, &table_ks);
 
     start = clock();
-    ks2_a(profits, weights, capacity, n, s_size, t_size, t, s, (int (*)[(int)(s_size+1)])table_minCap, x3);
+    alloc_minCap_d(&t, &t_size, &table_minCap, capacity, n, weights);
+    minCap_a_d(weights, n, &t, &t_size, &s, &s_size, capacity, (double (*)[(int)(capacity+1)])table_minCap);
+    alloc_ks2_d(s_size, n, &table_ks);
+    end = clock();
+    cpu_time_used_to_alloc = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
+    ks2_a_d(profits, weights, capacity, n, s_size, t_size, t, s, (double (*)[(int)(s_size+1)])table_minCap, x3);
     end = clock();
     cpu_time_used_alloc = ((double) (end - start)) / CLOCKS_PER_SEC;
     
@@ -1013,60 +1444,146 @@ void main(int argc, char *argv[]){
     for(int i=0; i<n; i++){
         res1 += x3[i]*profits[i];
     }
-    //printf("res1: %10lf\n", res1);
+    printf("res ks:\t\t\t%10lf\n", res1);
 
-    // --
-    
+    // FMINKNAP ----
+    itype *p_fminknap;              //profitti
+    itype *w_fminknap;              //pesi 
+    int *x;                         //solution vector
+    SolutionList *s_list;           
+    int z = 0;                      //optimal objective value
+
+    x = calloc(n, sizeof(int));
+    readitypeValues(argv[1], &p_fminknap, &w_fminknap, &n);
+
+    openPisinger(n);
+
+    start = clock();
+    minknap(&s_list, n, p_fminknap, w_fminknap, x, capacity);
+    end = clock();
+    cpu_time_used_fminknap = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    #ifdef SHOWRES
+    printa(x, n);
+    #endif
+
+    closePisinger();
+
+    double res2 = 0;
+    for(int i=0; i<n; i++){
+        res2 += x[i]*profits[i];
+    }
+    printf("res fminknap:\t%10lf\n", res2);
+   
+    // RESULTS ----
+
     printf("CPU time used with standard implementation:\t\t\t\t\t\t%f\n", cpu_time_used);
     printf("CPU time used with column optimization:\t\t\t\t\t\t\t%f\n", cpu_time_used_opt);
     printf("CPU time used with column optimization and early allocation:\t%f\n", cpu_time_used_alloc);
-    printf("CPU time gain:\t\t\t\t\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
+    printf("CPU time used with to allocate:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used_to_alloc);
+    printf("CPU time used with fminknap:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used_fminknap);
+    printf("CPU time gain with column opt:\t\t\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_opt);
     printf("CPU time gain with early allocation:\t\t\t\t\t\t\t%f\n", cpu_time_used - cpu_time_used_alloc);
-    
+    printf("Difference between fminknap and ks:\t\t\t\t\t\t\t\t%f\n", ((res2>res1)?res2-res1:res1-res2));
 
 }
-*/
+
+
+// main per i test dell'ottimizzazione della memoria
+// void main(int argc, char *argv[]){
+//     if(argc < 3) {
+//         printf("Please specify the file containing the values and the capacity of the knapsack:\nbinaryKnapsack2a values.in 10");
+//         exit(EXIT_FAILURE);
+//     }
+//     printf("begin\n");
+//     int capacity = atoi(argv[2]);       //capacità
+
+//     // BINARYKNAPSACK
+//     double *profits;               
+//     int *weights;
+//     int n = 0;
+//     readValues_d_i(argv[1], &profits, &weights, &n);
+
+//     //printf("%f\n", profits[0]);
+//     printa_d(profits,n);
+//     printa(weights, n);
+    
+//         // V1 ----
+    
+//     int *x1 = calloc(n, sizeof(int));
+    
+
+//     ks_d(profits, weights, capacity, n, x1);
+
+//      printa(weights, n);
+    
+// }
 
 void main(int argc, char *argv[]){
     if(argc < 3) {
         printf("Please specify the file containing the values and the capacity of the knapsack:\nbinaryKnapsack2a values.in 10");
         exit(EXIT_FAILURE);
     }
-    
+    printf("begin\n");
     int capacity = atoi(argv[2]);       //capacità
 
-    clock_t start, end;
-    double cpu_time_used;
-    double cpu_time_used2;
-
     // BINARYKNAPSACK
-    int *profits;               
+    double *profits;               
     int *weights;
     int n = 0;
-    readValues(argv[1], &profits, &weights, &n);
+    readValues_d_i(argv[1], &profits, &weights, &n);
 
-    // V1
+
+    // V1 ----
     
     int *x1 = calloc(n, sizeof(int));
-    start = clock();
-    ks(profits, weights, capacity, n, x1);
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-//-- 
-    double *p;               
-    int *w;
-    int n1 = 0;
-
-    readValues_d_i(argv[3], &p, &w, &n1);
-
-    int *x2 = calloc(n1, sizeof(int));
     
-    start = clock();
-    ks_d(p, w, capacity, n, x2);
-    end = clock();
-    cpu_time_used2 = ((double) (end - start)) / CLOCKS_PER_SEC;
+    ks_d(profits, weights, capacity, n, x1);
+    
+    printa(x1, n);
 
-    printf("1) %lf\n", cpu_time_used);
-    printf("2) %lf\n", cpu_time_used2);
+    double resv1 = 0;
+    for(int i=0; i<n; i++){
+        resv1 += x1[i]*profits[i];
+    }
+    printf("resv1 ks:\t\t%10lf\n", resv1);
+
+    // V2 ----
+    
+    int *x2 = calloc(n, sizeof(int));
+
+    ks2_d(profits, weights, capacity, n, x2);
+    
+    printa(x2, n);
+
+    double resv2 = 0;
+    for(int i=0; i<n; i++){
+        resv2 += x2[i]*profits[i];
+    }
+    
+    printf("rev2 ks:\t\t%10lf\n", resv2);
+
+
+    itype *p_fminknap;              //profitti
+    itype *w_fminknap;              //pesi 
+    int *x;                         //solution vector
+    SolutionList *s_list;           
+    int z = 0;                      //optimal objective value
+    x = calloc(n, sizeof(int));
+    readitypeValues(argv[1], &p_fminknap, &w_fminknap, &n);
+
+    openPisinger(n);
+
+    minknap(&s_list, n, p_fminknap, w_fminknap, x, capacity);
+
+    printa(x, n);
+
+    closePisinger();
+
+    double res2 = 0;
+    for(int i=0; i<n; i++){
+        res2 += x[i]*profits[i];
+    }
+    printf("res fminknap:\t%10lf\n", res2);
+   
 }

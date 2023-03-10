@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "string.h": "c",
+        "unistd.h": "c",
+        "types.h": "c",
+        "fminknap_npg.h": "c"
+    }
+}

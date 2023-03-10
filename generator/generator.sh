@@ -1,8 +1,10 @@
 #! /bin/bash
 
-n=100
-range=20
-
+#n=100 #massimo senza segfault
+n=10
+#range=10100 #massimo senza segfault
+range=474
+#range=30
 
 ./gen.out $n $range 1 1 1000
 mv test.in files/uncorr
@@ -11,7 +13,6 @@ mv test.in files/uncorr
 ./gen.out $n $range 2 2 1000
 mv test.in files/weak_corr
 ./derived_instance_generator files/weak_corr 100
-
 
 ./gen.out $n $range 3 3 1000
 mv test.in files/str_corr

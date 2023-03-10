@@ -1,0 +1,56 @@
+File count: 500
+uncorr count: 100
+alm count: 100
+inv count: 100
+str count: 100
+weak count: 100
+-uncorr:
+CPU time used with standard implementation:						0.008770
+CPU time used with column optimization:							0.013795
+CPU time used with column optimization and early allocation:	0.004214
+CPU time used with fminknap:									0.000318
+CPU time used with to allocate:									0.000165
+CPU time gain with column opt:									-0.005025
+CPU time gain with early allocation:							0.004556
+res ks:			2442.000000
+res fminknap:	2442.000000
+-almost:
+CPU time used with standard implementation:						0.009977
+CPU time used with column optimization:							0.015562
+CPU time used with column optimization and early allocation:	0.004213
+CPU time used with fminknap:									0.000464
+CPU time used with to allocate:									0.000215
+CPU time gain with column opt:									-0.005585
+CPU time gain with early allocation:							0.005764
+res ks:			584.000000
+res fminknap:	598.000000
+-inv:
+CPU time used with standard implementation:						0.010771
+CPU time used with column optimization:							0.009587
+CPU time used with column optimization and early allocation:	0.000226
+CPU time used with fminknap:									0.000128
+CPU time used with to allocate:									0.000131
+CPU time gain with column opt:									0.001184
+CPU time gain with early allocation:							0.010545
+res ks:			  0.000000
+res fminknap:	  0.000000
+-str:
+CPU time used with standard implementation:						0.009892
+CPU time used with column optimization:							0.015631
+CPU time used with column optimization and early allocation:	0.004145
+CPU time used with fminknap:									0.000395
+CPU time used with to allocate:									0.000201
+CPU time gain with column opt:									-0.005739
+CPU time gain with early allocation:							0.005747
+res ks:			500.000000
+res fminknap:	589.000000
+-weak:
+CPU time used with standard implementation:						0.008409
+CPU time used with column optimization:							0.013616
+CPU time used with column optimization and early allocation:	0.004405
+CPU time used with fminknap:									0.000278
+CPU time used with to allocate:									0.000168
+CPU time gain with column opt:									-0.005207
+CPU time gain with early allocation:							0.004004
+res ks:			340.000000
+res fminknap:	371.000000
