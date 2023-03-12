@@ -262,7 +262,6 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
             }else{
                 mat[i][j] = mat[i-1][j-w]+p; 
             }
-
         }
     }
 

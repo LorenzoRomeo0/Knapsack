@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 //#define SHOWRES
-#define SHOWMAT
+//#define SHOWMAT
 
 
 /* ======================================================================
@@ -252,7 +252,7 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
     for(int i=0; i < n+1; i++){
         for(int j=0; j<capacity+1; j++){
             int w = (i == 0)? 0 : weights[i-1];
-            int p = (i == 0)? 0 : profits[i-1];
+            float p = (i == 0)? 0 : profits[i-1];
 
             if(i == 0 || j == 0) mat[i][j] = 0;
             else if(j-w<0) {
@@ -283,7 +283,7 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
     int maxprofit = 0;
     printf("matrix:\n");
 
-    for(int j = 0; j < capacity+1; j++) printf("%3d ", j);
+    for(int j = 0; j < capacity+1; j++) printf("%10f ", (double)j);
     printf("\n");
     for(int j = 0; j < capacity+1; j++) printf("%3s","_");
     printf("\n");    
@@ -386,13 +386,13 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     *size_t = capacity+1;
 
     // Build table
-    int mat[n+1][capacity+1];
+    int mat[n+2][capacity+1];
 
     for(int i = 0; i<n+1;i++)
         for(int j=0;j<capacity+1;j++) mat[i][j] = capacity;
 
 
-    for(int i=0; i<n+1; i++){
+    for(int i=0; i<=n+1; i++){
         for(int j=0; j<capacity+1; j++){
 
             int w = (i == 0)? 0 : weights[i-1];
@@ -423,16 +423,38 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     int s_cont = 0;
     
     //print matrix
-    
+
+    #ifdef SHOWRES  
+    for(int i=0; i<capacity+1; i++) printf("%3d ", i);
+    printf("\n");
+    for(int i=0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+            printf("%3d ", mat[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    printf("\n"); 
+    #endif
 
     for(int i=0; i<capacity+1; i++){
-        if(mat[n][i] <= capacity){
+        if(mat[n][i] <= capacity){  // < anche qui!
             (*t)[i] = counter++;
             (*s)[s_cont++] = i;
         }else{
             (*t)[i] = -1;
         }
     }
+
+    #ifdef SHOWMAT
+    printf("t, s:\n");
+    for(int i=0; i<capacity+1; i++) printf("%3d ", i);
+    printf("\n");
+    for(int i=0; i<capacity+1; i++) printf("%3d ", (*t)[i]);
+    printf("\n");
+    for(int i=0; i<*size_s; i++) printf("%3d ", (*s)[i]);
+    printf("\n");
+    #endif
     return capacity+1;
 }
 
@@ -501,7 +523,6 @@ int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, 
     }
     return capacity+1;
 }
-
 
 /*
 // Removes the redundant columns
@@ -654,7 +675,16 @@ void ks2(int *profits, int *weights, int capacity, int n, int* x){
     */
 }
 
-void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
+void ks2_d1(double *profits, int *weights, int capacity, int n, int* x){
+
+    printf("w, p:\n");
+    for(int i=0; i<n; i++) printf("%10f ", (double)i);
+    printf("\n");
+    for(int i=0; i<n; i++) printf("%10f ", (double)weights[i]);
+    printf("\n");
+    for(int i=0; i<n; i++) printf("%10f ", profits[i]);
+
+    printf("\n");
 
     // trivial solution
     int sumWeights = 0;
@@ -677,26 +707,81 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
     for(int i = 0; i<n+1; i++)
         for(int j=0; j<s_size; j++) mat[i][j] = 0;
     
+
     for(int i = 0; i < n+1; i++){
         for(int j = 0; j < s_size; j++){
             int w = (i == 0)? 0 : weights[i-1];
-            int p = (i == 0)? 0 : profits[i-1];
+            float p = (i == 0)? 0 : profits[i-1];
 
             int clm = s[j];
-            int cfr = (clm-w < 0)? -1 : (t[ clm - w ]<0) ? t[ clm - w -1 ]: t[ clm - w ];
+            //int cfr = (clm-w < 0)? -1 : (t[ clm - w ]<0) ? t[ clm - w -1 ]: t[ clm - w ];
 
+            int cfr = (clm-w < 0)? -2 : t[ clm - w ];
+            
+            //double oldVal = (t[clm - w]<0 && i!=0)? profits[0] : mat[i-1][cfr];
+            
+            //double oldVal = (t[clm - w] == -1  && i!=0)? mat[i-1][ t[s[j-1]] - w ] : mat[i-1][cfr];
+            
+            // double oldVal = (t[clm - w]<0)? mat[i-1][]: mat[i-1][cfr];
+            //oldVal = (t[clm - w]<0 && i==n)? mat[i][j-1] : oldVal;
+            int prevCol = -1;
+            if((clm - w) >= 0)
+                for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
+                //printf("||||||||| prevCol = %d\n", prevCol);
+            double oldVal = 0;
+            oldVal = (t[clm - w] == -1 && i != 0)? mat[i-1][t[prevCol]]: mat[i-1][cfr];
+            if(clm == 241 && i==6){
+                printf("DEBUG: ----\n");
+                printf("m[i, j] = m[%d, %d]\n", i, j);
+                printf("w = %d\n", w);
+                printf("p = %f\n", p);
+                printf("clm = s[%d] = %d\n", j , clm);             
+                printf("clm - w = %d - %d = %d\n", clm, w, clm-w);
+                printf("cfr = %d\n", cfr);
+                printf("oldVal = mat[i-1][cfr] = %f\n", oldVal);
+                printf("t[%d] = %d\n", clm-w, t[clm-w]);
+                printf("mat[i-1][j] = %f\n", mat[i-1][j]);
+                printf("mat[i-1][j] > oldVal+p = %f > %f + %f = %f\n",mat[i-1][j],oldVal , p, oldVal+p);
+                printf("prevCol = %d \n", prevCol);
+                printf("mat[i-1][t[prevCol]] = %f\n", mat[i-1][t[prevCol]]);
+                printf("------DEBUG\n");
+            }
+            // if(i == 9 && j == 50 ){
+            //     printf("DEBUG: ----\n");
+            //     printf("m[i, j] = m[%d, %d]\n", i, j);
+            //     printf("w = %d\n", w);
+            //     printf("p = %f\n", p);
+            //     printf("clm = s[%d] = %d\n", j , clm);
+            //     printf("clm - w = %d - %d = %d\n", clm, w, clm-w);
+            //     printf("cfr = %d\n", cfr);
+            //     printf("oldVal = mat[i-1][cfr] = %f\n", oldVal);
+            //     printf("t[%d] = %d\n", clm-w, t[clm-w]);
+            //     printf("mat[i-1][j] = %f\n", mat[i-1][j]);
+            //     printf("mat[i-1][j] > oldVal+p = %f > %f + %f = %f\n ",mat[i-1][j],oldVal , p, oldVal+p);
+            //     printf("------DEBUG\n");
+            // }
+            
             if(i == 0 || j == 0) mat[i][j] = 0;
-            else if(cfr < 0){
+            else if(cfr == -2){
+                mat[i][j] = mat[i-1][j];   
+            }else if(t[clm - w]<0 && mat[i-1][j] == 0){
+                mat[i][j] = profits[0];
+                     
+            // }else if(mat[i-1][j] > mat[i-1][cfr]+p){ 
+                 
+            //     mat[i][j] = mat[i-1][j];
+            // } else{
+            //     mat[i][j] = mat[i-1][cfr]+p; 
+            // }
+            }else if(mat[i-1][j] > oldVal+p){ 
+                 
                 mat[i][j] = mat[i-1][j];
-            }else if(mat[i-1][j] > mat[i-1][cfr]+p){
-                mat[i][j] = mat[i-1][j];
-           } else{
-                mat[i][j] = mat[i-1][cfr]+p; 
+            } else{
+                mat[i][j] = oldVal+p; 
             }
         }
     }
 
-    //int *res = calloc(n, sizeof(int));
     int remainingCapacity = capacity;
     int indexWeight = capacity;
 
@@ -719,14 +804,9 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
     #ifdef SHOWMAT
         printf("matrix:\n");
 
-        for(int j = 0; j < s_size; j++) printf("%9d ", s[j]);
+        for(int j = 0; j < s_size; j++) printf("%10lf ", (float)s[j]);
         printf("\n");
         for(int j = 0; j < s_size; j++) printf("%3s","_");
-        printf("\n");
-
-        for(int j = 0; j < s_size; j++){
-            printf("%8d ", s[j]);
-        }
         printf("\n");
 
         printm_d(n+1, s_size, mat);
@@ -745,6 +825,198 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
     #endif
     */
 }
+
+void ks2_d2(double *profits, int *weights, int capacity, int n, int* x){
+    // trivial solution
+    int sumWeights = 0;
+    for(int i=0; i<n; i++) sumWeights+=weights[i];
+    if(capacity >= sumWeights){
+        for(int i=0; i<n; i++) x[i] = 1;
+        return;
+    }
+
+    // Get column values
+    int *t;
+    int *s;
+    int t_size;
+    int s_size;
+    minCap(weights, n, &t, &t_size, &s, &s_size, capacity);
+
+    // Table creation
+    double mat[n+1][s_size];
+
+    for(int i = 0; i<n+1; i++)
+        for(int j=0; j<s_size; j++) mat[i][j] = 0;
+    
+
+    for(int i = 0; i < n+1; i++){
+        for(int j = 0; j < s_size; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            float p = (i == 0)? 0 : profits[i-1];
+
+
+
+            int clm = s[j];
+
+            int cfr = (clm-w < 0)? -2 : t[ clm - w ];
+
+            int prevCol = -1;
+            if((clm - w) >= 0)
+                for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
+            double oldVal = 0;
+            oldVal = (t[clm - w] == -1 && i != 0)? mat[i-1][t[prevCol]]: mat[i-1][cfr];
+            
+            if(i == 0 || j == 0) mat[i][j] = 0;
+            else if(cfr == -2){
+                mat[i][j] = mat[i-1][j];   
+            }else if(t[clm - w]<0 && mat[i-1][j] == 0){
+                mat[i][j] = profits[0];
+            }else if(mat[i-1][j] > oldVal+p){ 
+                 
+                mat[i][j] = mat[i-1][j];
+            } else{
+                mat[i][j] = oldVal+p; 
+            }
+        }
+    }
+
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+    for(int i=n; i>0; i--){
+        if(t[indexWeight]<0){
+            indexWeight--;
+            i++;
+            continue;
+        } 
+        if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
+            //printf("i = %d, indexwe = %d, t = %d\n", i, indexWeight, t[indexWeight]);
+            x[i-1] = 1;
+            remainingCapacity -= weights[i-1];
+            indexWeight = remainingCapacity;      
+        }
+    }
+    
+    // Result visualization
+
+    #ifdef SHOWMAT
+        printf("matrix:\n");
+
+        for(int j = 0; j < s_size; j++) printf("%10lf ", (float)s[j]);
+        printf("\n");
+        for(int j = 0; j < s_size; j++) printf("%3s","_");
+        printf("\n");
+
+        printm_d(n+1, s_size, mat);
+        printf("\n");
+    #endif
+
+    /*
+    #ifdef SHOWRES
+    int maxprofit = 0;
+    printf("Result: ");
+    for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
+        }
+    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    #endif
+    */
+}
+
+void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
+    // trivial solution
+    int sumWeights = 0;
+    for(int i=0; i<n; i++) sumWeights+=weights[i];
+    if(capacity >= sumWeights){
+        for(int i=0; i<n; i++) x[i] = 1;
+        return;
+    }
+
+    // Get column values
+    int *t;
+    int *s;
+    int t_size;
+    int s_size;
+    minCap_opt(weights, n, &t, &t_size, &s, &s_size, capacity);
+
+    // Table creation
+    double mat[n+1][s_size];
+
+    for(int i = 0; i<n+1; i++)
+        for(int j=0; j<s_size; j++) mat[i][j] = 0;
+    
+    for(int i = 0; i < n+1; i++){
+        for(int j = 0; j < s_size; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            float p = (i == 0)? 0 : profits[i-1];
+            int clm = s[j];                                 
+            int cfr = (clm - w < 0)? -2 : t[clm - w];
+            int prevCol = -1;
+            
+            if((clm - w) >= 0)
+                for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
+
+            double oldVal = (t[clm - w] == -1 && i != 0)? mat[i-1][t[prevCol]]: mat[i-1][cfr];
+            
+            if(i == 0 || j == 0) mat[i][j] = 0;
+            else if(cfr == -2){
+                mat[i][j] = mat[i-1][j];   
+            }else if(t[clm - w]<0 && mat[i-1][j] == 0){
+                mat[i][j] = profits[0];
+            }else if(mat[i-1][j] > oldVal+p){ 
+                 
+                mat[i][j] = mat[i-1][j];
+            } else{
+                mat[i][j] = oldVal+p; 
+            }
+        }
+    }
+
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+    for(int i=n; i>0; i--){
+        if(t[indexWeight]<0){
+            indexWeight--;
+            i++;
+            continue;
+        } 
+        if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
+            //printf("i = %d, indexwe = %d, t = %d\n", i, indexWeight, t[indexWeight]);
+            x[i-1] = 1;
+            remainingCapacity -= weights[i-1];
+            indexWeight = remainingCapacity;      
+        }
+    }
+    
+    // Result visualization
+
+    #ifdef SHOWMAT
+        printf("matrix:\n");
+
+        for(int j = 0; j < s_size; j++) printf("%10lf ", (float)s[j]);
+        printf("\n");
+        for(int j = 0; j < s_size; j++) printf("%3s","_");
+        printf("\n");
+
+        printm_d(n+1, s_size, mat);
+        printf("\n");
+    #endif
+
+    /*
+    #ifdef SHOWRES
+    int maxprofit = 0;
+    printf("Result: ");
+    for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
+        }
+    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    #endif
+    */
+}
+
 
 void ks2_d_opt(double *profits, int *weights, int capacity, int n, int* x){
 
@@ -1540,13 +1812,13 @@ void main(int argc, char *argv[]){
     
     ks_d(profits, weights, capacity, n, x1);
     
-    printa(x1, n);
+    //printa(x1, n);
 
     double resv1 = 0;
     for(int i=0; i<n; i++){
         resv1 += x1[i]*profits[i];
     }
-    printf("resv1 ks:\t\t%10lf\n", resv1);
+    //printf("resv1 ks:\t\t%10lf\n-----------------------------------\n", resv1);
 
     // V2 ----
     
@@ -1554,14 +1826,14 @@ void main(int argc, char *argv[]){
 
     ks2_d(profits, weights, capacity, n, x2);
     
-    printa(x2, n);
+    //printa(x2, n);
 
     double resv2 = 0;
     for(int i=0; i<n; i++){
         resv2 += x2[i]*profits[i];
     }
     
-    printf("rev2 ks:\t\t%10lf\n", resv2);
+    //printf("rev2 ks:\t\t%10lf\n-----------------------------------\n", resv2);
 
 
     itype *p_fminknap;              //profitti
@@ -1576,7 +1848,7 @@ void main(int argc, char *argv[]){
 
     minknap(&s_list, n, p_fminknap, w_fminknap, x, capacity);
 
-    printa(x, n);
+    //printa(x, n);
 
     closePisinger();
 
@@ -1584,6 +1856,8 @@ void main(int argc, char *argv[]){
     for(int i=0; i<n; i++){
         res2 += x[i]*profits[i];
     }
-    printf("res fminknap:\t%10lf\n", res2);
-   
+    //printf("res fminknap:\t%10lf\n-----------------------------------\n-----------------------------------\n", res2);
+
+    if(resv2 != res2) printf("NO");
+    //printf("%s\n-----", (resv1 == res2 && resv2 == res2)?" ":"NO");
 }
