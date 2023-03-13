@@ -12,11 +12,12 @@ capacity=500
 #gcc binaryKnapsack_timed.c -o binaryKnapsack
 #gcc binaryKnapsack3.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack
 #gcc binaryKnapsack3.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm
-gcc binaryKnapsack3_test.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm
+#gcc binaryKnapsack3_test.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm
+gcc binaryKnapsack3.1.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm
 
 #gcc binaryKnapsack3_test.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && binaryKnapsack "generator/files/str_corr" 200 "generator/files/derived/int/str_corr"
-#gcc binaryKnapsack4.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ./generator/files/derived/int/ 100 > testing.txt
-
+#gcc binaryKnapsack4.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ./generator/files/derived/int/ 500 > buffer.txt
+#gcc binaryKnapsack4.1.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ./generator/files/derived/int/ 500 > buffer.txt
 run(){
   for i in generator/files/derived/*; do
   #for i in generator/files/*; do

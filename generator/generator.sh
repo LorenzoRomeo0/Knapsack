@@ -1,9 +1,10 @@
 #! /bin/bash
 
-#n=100 #massimo senza segfault
-n=10
+n=100 #massimo senza segfault
+#n=10
 #range=10100 #massimo senza segfault
-range=474
+range=50000
+#range=474
 #range=30
 
 ./gen.out $n $range 1 1 1000

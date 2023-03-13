@@ -463,13 +463,8 @@ int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, 
     int computedCapacity = 0;
     for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
     capacity = (computedCapacity>capacity)?capacity:computedCapacity;
-    
-
-    *size_t = capacity+1;
 
     // Build table
-    int mat[n+1][capacity+1];
-
     int c1[capacity+1];
     int c2[capacity+1];
 
@@ -504,6 +499,7 @@ int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, 
     }
 
     // Build result arrays
+    *size_t = capacity+1;
     *size_s = 0;
     for(int i=0; i<capacity+1; i++)
         if(prev[i] <= capacity) (*size_s)++;

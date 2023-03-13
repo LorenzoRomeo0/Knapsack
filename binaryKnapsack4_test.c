@@ -498,6 +498,66 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     return capacity+1;
 }
 
+int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+
+    int c1[capacity+1];
+    int c2[capacity+1];
+
+    int *prev = c2;
+    int *current = c1;
+    int *aux;
+
+    for(int i = 0; i<n+1;i++) c1[i] = 0;
+    for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+    for(int i=0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : 1;
+
+            if(j == 0){
+                current[j] = 0;
+            }else if(i == 0){
+                current[j] = capacity+1;
+            } else if(j-w < 0){ 
+                current[j] = prev[j];
+            }else if(prev[j] < current[j-w]+w ){
+                current[j] = prev[j];
+            } else{
+                current[j] = prev[j-w]+w; 
+            }
+        }
+        aux = current;
+        current = prev;
+        prev = aux;
+    }
+
+    // Build result arrays
+    *size_t = capacity+1;
+    *size_s = 0;
+    for(int i=0; i<capacity+1; i++)
+        if(prev[i] <= capacity) (*size_s)++;
+
+    *t = calloc(*size_t, sizeof(int));
+    *s = calloc(*size_s, sizeof(int));
+    int counter = 0;
+    int s_cont = 0;
+    
+    for(int i=0; i<capacity+1; i++){
+        if(prev[i] <= capacity){
+            (*t)[i] = counter++;
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+    }
+    return capacity+1;
+}
+
 /*
 // Removes the redundant columns
 int minCap_d(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
@@ -726,6 +786,98 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
         for(int j = 0; j < s_size; j++){
             printf("%10d ", s[j]);
         }
+        printf("\n");
+
+        printm_d(n+1, s_size, mat);
+        printf("\n");
+    #endif
+
+    /*
+    #ifdef SHOWRES
+    int maxprofit = 0;
+    printf("Result: ");
+    for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
+        }
+    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    #endif
+    */
+}
+
+void ks2_d_opt(double *profits, int *weights, int capacity, int n, int* x){
+    // trivial solution
+    int sumWeights = 0;
+    for(int i=0; i<n; i++) sumWeights+=weights[i];
+    if(capacity >= sumWeights){
+        for(int i=0; i<n; i++) x[i] = 1;
+        return;
+    }
+
+    // Get column values
+    int *t;
+    int *s;
+    int t_size;
+    int s_size;
+    minCap_opt(weights, n, &t, &t_size, &s, &s_size, capacity);
+
+    // Table creation
+    double mat[n+1][s_size];
+
+    for(int i = 0; i<n+1; i++)
+        for(int j=0; j<s_size; j++) mat[i][j] = 0;
+    
+    for(int i = 0; i < n+1; i++){
+        for(int j = 0; j < s_size; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            float p = (i == 0)? 0 : profits[i-1];
+            int clm = s[j];                                 
+            int cfr = (clm - w < 0)? -2 : t[clm - w];
+            int prevCol = -1;
+            
+            if((clm - w) >= 0)
+                for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
+
+            double oldVal = (t[clm - w] == -1 && i != 0)? mat[i-1][t[prevCol]]: mat[i-1][cfr];
+            
+            if(i == 0 || j == 0) mat[i][j] = 0;
+            else if(cfr == -2){
+                mat[i][j] = mat[i-1][j];   
+            }else if(t[clm - w]<0 && mat[i-1][j] == 0){
+                mat[i][j] = profits[0];
+            }else if(mat[i-1][j] > oldVal+p){ 
+                 
+                mat[i][j] = mat[i-1][j];
+            } else{
+                mat[i][j] = oldVal+p; 
+            }
+        }
+    }
+
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+    for(int i=n; i>0; i--){
+        if(t[indexWeight]<0){
+            indexWeight--;
+            i++;
+            continue;
+        } 
+        if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
+            x[i-1] = 1;
+            remainingCapacity -= weights[i-1];
+            indexWeight = remainingCapacity;      
+        }
+    }
+    
+    // Result visualization
+
+    #ifdef SHOWMAT
+        printf("matrix:\n");
+
+        for(int j = 0; j < s_size; j++) printf("%10lf ", (float)s[j]);
+        printf("\n");
+        for(int j = 0; j < s_size; j++) printf("%3s","_");
         printf("\n");
 
         printm_d(n+1, s_size, mat);
@@ -1054,6 +1206,87 @@ void ks2_a_d(double *profits, int *weights, int capacity, int n, int s_size, int
     for(int i=0; i<n; i++){
             printf("(%d)%d%s", x[i], i, (i+1==n)?".\n":", ");
             maxprofit += x[i]*profits[i];
+        }
+    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    #endif
+    */
+}
+
+void ks2_a_d_i(double *profits, int *weights, int capacity, int n, int s_size, int t_size, int *t, int *s, double mat[n+1][s_size], int* x){
+    // trivial solution
+    int sumWeights = 0;
+    for(int i=0; i<n; i++) sumWeights+=weights[i];
+    if(capacity >= sumWeights){
+        for(int i=0; i<n; i++) x[i] = 1;
+        return;
+    }
+
+    // Table creation
+
+    for(int i = 0; i < n+1; i++){
+        for(int j = 0; j < s_size; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            float p = (i == 0)? 0 : profits[i-1];
+            int clm = s[j];                                 
+            int cfr = (clm - w < 0)? -2 : t[clm - w];
+            int prevCol = -1;
+            
+            if((clm - w) >= 0)
+                for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
+
+            double oldVal = (t[clm - w] == -1 && i != 0)? mat[i-1][t[prevCol]]: mat[i-1][cfr];
+            
+            if(i == 0 || j == 0) mat[i][j] = 0;
+            else if(cfr == -2){
+                mat[i][j] = mat[i-1][j];   
+            }else if(t[clm - w]<0 && mat[i-1][j] == 0){
+                mat[i][j] = profits[0];
+            }else if(mat[i-1][j] > oldVal+p){ 
+                 
+                mat[i][j] = mat[i-1][j];
+            } else{
+                mat[i][j] = oldVal+p; 
+            }
+        }
+    }
+
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+    for(int i=n; i>0; i--){
+        if(t[indexWeight]<0){
+            indexWeight--;
+            i++;
+            continue;
+        } 
+        if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
+            x[i-1] = 1;
+            remainingCapacity -= weights[i-1];
+            indexWeight = remainingCapacity;      
+        }
+    }
+    
+    // Result visualization
+
+    #ifdef SHOWMAT
+        printf("matrix:\n");
+
+        for(int j = 0; j < s_size; j++) printf("%10lf ", (float)s[j]);
+        printf("\n");
+        for(int j = 0; j < s_size; j++) printf("%3s","_");
+        printf("\n");
+
+        printm_d(n+1, s_size, mat);
+        printf("\n");
+    #endif
+
+    /*
+    #ifdef SHOWRES
+    int maxprofit = 0;
+    printf("Result: ");
+    for(int i=0; i<n; i++){
+            printf("(%d)%d%s", res[i], i, (i+1==n)?".\n":", ");
+            maxprofit += res[i]*profits[i];
         }
     printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
     #endif

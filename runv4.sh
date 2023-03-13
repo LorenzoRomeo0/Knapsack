@@ -1,0 +1,7 @@
+#capacity=300
+capacity=20300 #massimo senza segfault per minCap
+
+files="./generator/files/derived/int/"
+#gcc binaryKnapsack4.1.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack $files $capacity > buffer.txt
+#gcc binaryKnapsack4.1.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ./generator/files/derived/int/ 300 > buffer.txt
+gcc binaryKnapsack_ks2.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack $files $capacity
