@@ -273,21 +273,18 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
 				  binary knapsack v2
    ====================================================================== */
 
-int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
-
+int minCap(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity) {
     int computedCapacity = 0;
     for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
     capacity = (computedCapacity>capacity)?capacity:computedCapacity;
     
-
-    *size_t = capacity+1;
+    *t_size = capacity+1;
 
     // Build table
     int mat[n+1][capacity+1];
 
     for(int i = 0; i<n+1;i++)
         for(int j=0;j<capacity+1;j++) mat[i][j] = capacity;
-
 
     for(int i=0; i<n+1; i++){
         for(int j=0; j<capacity+1; j++){
@@ -310,12 +307,12 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     }
 
     // Build result arrays
-    *size_s = 0;
+    *s_size = 0;
     for(int i=0; i<capacity+1; i++)
-        if(mat[n][i] <= capacity) (*size_s)++;
+        if(mat[n][i] <= capacity) (*s_size)++;
 
-    *t = calloc(*size_t, sizeof(int));
-    *s = calloc(*size_s, sizeof(int));
+    *t = calloc(*t_size, sizeof(int));
+    *s = calloc(*s_size, sizeof(int));
     int counter = 0;
     int s_cont = 0;
     
@@ -329,6 +326,70 @@ int minCap(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int 
     }
     return capacity+1;
 }
+
+int minCap_opt(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity) {
+
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+
+    *t_size = capacity+1;
+
+    int *c1 = (int*) calloc(capacity+1, sizeof(int));
+    int *c2 = (int*)  calloc(capacity+1, sizeof(int));
+
+    int *prev = c2;
+    int *current = c1;
+    int *aux;
+
+    for(int i = 0; i<n+1;i++) c1[i] = 0;
+    for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+    for(int i=0; i<n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+
+            int w = (i == 0)? 0 : weights[i-1];
+            int p = (i == 0)? 0 : 1;
+
+            if(j == 0){
+                current[j] = 0;
+            }else if(i == 0){
+                current[j] = capacity+1;
+            } else if(j-w < 0){ 
+                current[j] = prev[j];
+            }else if(prev[j] < current[j-w]+w ){
+                current[j] = prev[j];
+            } else{
+                current[j] = prev[j-w]+w; 
+            }
+        }
+        aux = current;
+        current = prev;
+        prev = aux;
+    }
+
+    // Build result arrays
+    *s_size = 0;
+    for(int i=0; i<capacity+1; i++)
+        if(prev[i] <= capacity) (*s_size)++;
+
+    *t = calloc(*t_size, sizeof(int));
+    *s = calloc(*s_size, sizeof(int));
+    int counter = 0;
+    int s_cont = 0;
+    
+    for(int i=0; i<capacity+1; i++){
+        if(prev[i] <= capacity){
+            (*t)[i] = counter++;
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+    }
+
+    return capacity+1;
+}
+
 
 /*
 // Removes the redundant columns
