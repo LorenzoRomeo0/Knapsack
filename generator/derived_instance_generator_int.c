@@ -73,10 +73,13 @@ void derive_int_instances(char* filename, int instance_n){
             exit(EXIT_FAILURE);
         while ((read = getline(&line, &len, fp)) != -1 && itemsNr--) {
             double random_nr = rand_normal(0, 0.5);
+            //int random_nr = rand_normal(0, 0.5)*100; //garantito che siano sempre != 0?
+            //printf("%d\n", random_nr);
             random_nr = (random_nr<0)?-random_nr:random_nr;
             sscanf(line, "%5d %5d %5d", &a, &b, &c);
             //fprintf(new_fp, "%5d %5d %f\n", a, b, c*random_nr);
-            fprintf(new_fp, "%5d %lf %5d\n", a, (double)b, c);
+            fprintf(new_fp, "%5d %lf %5d\n", a, ((double)b)*random_nr, c);
+            //fprintf(new_fp, "%5d %lf %5d\n", a, (double)b, c*random_nr);
         }
 
         free(new_filename);

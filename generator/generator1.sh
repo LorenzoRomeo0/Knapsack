@@ -2,9 +2,12 @@
 
 gcc derived_instance_generator_int.c -o derived_instance_generator_int -lm
 
-n=100
+n=50
 #range=20
-range=4300
+range=100
+#range=4300
+#range=20300
+#range=50000
 instanceNr=100
 
 ./gen.out $n $range 1 1 1000

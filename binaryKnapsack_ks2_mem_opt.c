@@ -14,6 +14,14 @@
 #define MAX_FILES 15000
 #define MAX_INSTANCE_FILENAME_SIZE 200
 
+void printa(int a[], size_t size){
+    /* print array */
+    for(int i = 0; i<size; i++)
+        printf("%3d ",a[i]);
+    printf("\n");
+}
+
+
 void getFnmatch(char *filenames[MAX_FILES], char *output[MAX_INSTANCES], size_t filenameSize, size_t *outputSize, char* match){
     *outputSize = 0;
     for(int i = 0; i<filenameSize; i++){
@@ -97,12 +105,10 @@ int readValues_d_i(char* filename, double **profits, int **weights, int *size){
     fclose(fp);
 }
 
-
 /**
  * Inserts in filenames the names of the files contained in the dir specified in dirname.
  * returns the actual number of files.
 */
-
 int getFilenames(char* dirname, int maxFiles, char *filenames[maxFiles]){
     int fileNr = 0;
 
@@ -140,52 +146,106 @@ int getFilenames(char* dirname, int maxFiles, char *filenames[maxFiles]){
     return fileNr;
 }
 
-int readAllFilenames(char* dirname){
-    DIR *dir;
-    struct dirent *entry;
+// KS V1
+void ks_d(double *profits, int *weights, int capacity, int n, int* x){
+    /*  0-1 knapsack */
 
-    dir = opendir(dirname);
-    if (dir == NULL) {
-        perror("opendir");
-        return 1;
+    // Trivial solution
+    int sumWeights = 0;
+    for(int i=0; i<n; i++) sumWeights+=weights[i];
+    if(capacity >= sumWeights){
+        for(int i=0; i<n; i++) x[i] = 1;
+        return;
     }
 
-    while ((entry = readdir(dir)) != NULL) {
-        printf("%s\n", entry->d_name);
+    // Table creation
+    double mat[n+1][capacity+1];
+
+    for(int i = 0; i<n+1;i++)
+        for(int j=0;j<capacity+1;j++) mat[i][j] = 0;
+
+    for(int i=0; i < n+1; i++){
+        for(int j=0; j<capacity+1; j++){
+            int w = (i == 0)? 0 : weights[i-1];
+            double p = (i == 0)? 0 : profits[i-1];
+
+            if(i == 0 || j == 0) mat[i][j] = 0;
+            else if(j-w<0) {
+                mat[i][j] = mat[i-1][j];
+            }else if(mat[i-1][j] > mat[i-1][j-w]+p){
+                mat[i][j] = mat[i-1][j];
+            }else{
+                mat[i][j] = mat[i-1][j-w]+p; 
+            }
+        }
     }
 
-    closedir(dir);
-    return 0;
+    // Result search
+    int remainingCapacity = capacity;
+    int indexWeight = capacity;
+
+    for(int i=n; i>0; i--){
+        if(mat[i][indexWeight] != mat[i-1][indexWeight]){
+            x[i-1] = 1;
+            remainingCapacity -= weights[i-1];
+            indexWeight = remainingCapacity;      
+        }
+    }
+
+    // Result visualization
+    #ifdef SHOWMAT
+    int maxprofit = 0;
+    printf("matrix:\n");
+
+    for(int j = 0; j < capacity+1; j++) printf("%3d ", j);
+    printf("\n");
+    for(int j = 0; j < capacity+1; j++) printf("%3s","_");
+    printf("\n");    
+
+    printm_d(n+1, capacity+1, mat);
+    printf("\n");
+    #endif
+
+    /*
+    #ifdef SHOWRES
+    printf("Result: ");
+    for(int i=0; i<n; i++){
+            printf("(%d)%d%s", x[i], i, (i+1==n)?".\n":", ");
+            maxprofit += x[i]*profits[i];
+
+        }
+    printf("Maximum profits: %d (for %d capacity)\n", maxprofit, capacity);
+    #endif
+    */
 }
 
+//-
 
-int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, int capacity) {
-
+// KS2 con ottimizzazione delle colnne
+int minCap_opt(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity) {
+    // calcolo della dimensione di t
     int computedCapacity = 0;
     for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
-    capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+    //capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+    *t_size = capacity+1;
 
-    *size_t = capacity+1;
+    printf("n: %d, capac: %d\n", n, capacity);
+    printa(weights, n);
 
-    // Build table
-    //int mat[n+1][capacity+1];
-    // int **mat = (int**) malloc((n+1)* sizeof(int*));
-    // for(int i=0; i<n+1; i++){
-    //     mat[i] = (int*) malloc((capacity+1)* sizeof(int));
-    // }
-
-    int *c1 = (int*) calloc(capacity+1, sizeof(int));
-    int *c2 = (int*)  calloc(capacity+1, sizeof(int));
+    // Costruzione degli array che simulano la tabella di memoizzazione
+    int *c1 = (int*) calloc(computedCapacity+1, sizeof(int));
+    int *c2 = (int*) calloc(computedCapacity+1, sizeof(int));
 
     int *prev = c2;
     int *current = c1;
     int *aux;
 
-    for(int i = 0; i<n+1;i++) c1[i] = 0;
-    for(int i = 0; i<n+1;i++) c2[i] = 0;
+    // for(int i = 0; i<n+1;i++) c1[i] = 0;
+    // for(int i = 0; i<n+1;i++) c2[i] = 0;
 
     for(int i=0; i<n+1; i++){
-        for(int j=0; j<capacity+1; j++){
+        //for(int j=0; j<capacity+1; j++){
+        for(int j=0; j<computedCapacity+1; j++){
 
             int w = (i == 0)? 0 : weights[i-1];
             int p = (i == 0)? 0 : 1;
@@ -208,14 +268,21 @@ int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, 
     }
 
     // Build result arrays
-    *size_s = 0;
+    *s_size = 0;
     for(int i=0; i<capacity+1; i++)
-        if(prev[i] <= capacity) (*size_s)++;
+        if(prev[i] <= capacity) (*s_size)++;
 
-    *t = calloc(*size_t, sizeof(int));
-    *s = calloc(*size_s, sizeof(int));
+printf("---- s:%d t:%d\n", *s_size, *t_size);
+    *t = calloc(*t_size, sizeof(int));
+    *s = calloc(*s_size, sizeof(int));
+
+    // *t = malloc((*t_size)* sizeof(int));
+    // *s = malloc((*s_size)* sizeof(int));
+    // for(int i=0; i< (*t_size); i++) (*t) = 0;
+    // for(int i=0; i< (*s_size); i++) (*s) = 0;
     int counter = 0;
     int s_cont = 0;
+    
     
     for(int i=0; i<capacity+1; i++){
         if(prev[i] <= capacity){
@@ -225,18 +292,149 @@ int minCap_opt(int *weights, int n, int **t, int *size_t, int **s, int *size_s, 
             (*t)[i] = -1;
         }
     }
+
+    // rilascio della memoria dedicata agli array
+    free(c1);
+    free(c2);
+    
+    return capacity+1;
+}
+
+int minCapv2_(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity) {
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    capacity = (computedCapacity<capacity)?capacity:computedCapacity;
+
+    *t_size = capacity+1;
+
+    // Build table
+    
+    uint *c1 = (uint*) calloc(capacity+1, sizeof(uint));
+    uint *c2 = (uint*) calloc(capacity+1, sizeof(uint));
+
+    uint *prev = c2;
+    uint *current = c1;
+    uint *aux;
+    
+    // for(int i = 0; i<n+1;i++) c1[i] = 0;
+    // for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+    for(int i=0; i<n+1; i++){
+        //int w = (i == 0)? 0 : weights[i-1];
+        int w = weights[i];
+        //int p = (i == 0)? 0 : 1;
+        current[w] = prev[w] + 1;
+        //current[w] = prev[w];
+        for(int j=0; j<w; j++){
+            current[j] = prev[j];
+        }
+        for(int j=w+1; j<capacity+1; j++){
+            current[j] = prev[j] + prev[j-w];
+        }
+        aux = current;
+        current = prev;
+        prev = aux;
+        
+        //printa(current, n+1);
+    }
+
+    
+    // Build result arrays
+
+    int threshold = 1;
+
+    *s_size = 0;
+    for(int i=0; i<capacity+1; i++)
+        if(prev[i] > 0) (*s_size)++;
+
+    
+    *t = calloc(*t_size, sizeof(int));
+    *s = calloc(*s_size, sizeof(int));
+    int counter = 0;
+    int s_cont = 0;
+    
+    for(int i=0; i<capacity+1; i++){
+        if(prev[i] >= threshold){
+            (*t)[i] = counter++;
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+    }
     
     //free
-    // for(int i=0; i<n+1; i++){
-    //     free(mat[i]);
-    // }
-    // free(mat);
 
     free(c1);
     free(c2);
-
     return capacity+1;
 }
+
+int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, int threshold) {
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    //capacity = (computedCapacity<capacity)?capacity:computedCapacity;
+
+    *t_size = capacity+1;
+
+    // Build table
+    
+    uint *c1 = (uint*) calloc(computedCapacity+1, sizeof(uint));
+    uint *c2 = (uint*) calloc(computedCapacity+1, sizeof(uint));
+
+    uint *prev = c2;
+    uint *current = c1;
+    uint *aux;
+    
+    // for(int i = 0; i<n+1;i++) c1[i] = 0;
+    // for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+    for(int i=0; i<n+1; i++){
+        //int w = (i == 0)? 0 : weights[i-1];
+        int w = weights[i];
+        //int p = (i == 0)? 0 : 1;
+        current[w] = prev[w] + 1;
+        //current[w] = prev[w];
+        for(int j=0; j<w; j++){
+            current[j] = prev[j];
+        }
+        for(int j=w+1; j<capacity+1; j++){
+            current[j] = prev[j] + prev[j-w];
+        }
+        aux = current;
+        current = prev;
+        prev = aux;
+        
+        //printa(current, n+1);
+    }
+
+    
+    // Build result arrays
+
+    *s_size = 0;
+    for(int i=0; i<capacity+1; i++)
+        if(prev[i] > 0) (*s_size)++;
+
+    // printf("---- %d %d\n", *s_size, *t_size);
+    *t = calloc(*t_size, sizeof(int));
+    *s = calloc(*s_size, sizeof(int));
+    int counter = 0;
+    int s_cont = 0;
+    
+    for(int i=0; i<capacity+1; i++){
+        if(prev[i] >= threshold){
+            (*t)[i] = counter++;
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+    }
+    
+    //free
+    free(c1);
+    free(c2);
+    return capacity+1;
+}
+
 
 void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
     // trivial solution
@@ -330,8 +528,6 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
     */
 }
 
-
-//SEPARA MINCAP DA QUESTO, FINIRE QUI
 void ks2_di(double *profits, int *weights, int capacity, int n, int t_size, int t[t_size], int s_size, int s[s_size],  int* x){
     // trivial solution
     int sumWeights = 0;
@@ -539,7 +735,7 @@ void ks2_di_prealloc(double *profits, int *weights, int capacity, int n, int t_s
     #endif
     */
 }
-
+// --
 
 /* ======================================================================
 				  Main
@@ -553,8 +749,6 @@ int main(int argc, char *argv[]) {
     }
     int capacity = atoi(argv[2]);       //knapsack capacity
     char* filesPath = argv[1];          //instances path
-
-    //puts("begin\n");
 
     // instance types initialization ---
     char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
@@ -585,7 +779,7 @@ int main(int argc, char *argv[]) {
     char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t weakSize;
     getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
-    //printf("weak count: %ld\n", weakSize);
+    //printf("weak count: %ld\n", weatekSize);
     
     char** allTypes[] = {uncorr, alm, inv, str, weak};
     char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
@@ -593,82 +787,141 @@ int main(int argc, char *argv[]) {
     int typeCount = 0;
 
     //---
+
     // clock initialization ---
 
     clock_t start, end;
-    double cpu_time_used_opt[5] =       {0.0,0.0,0.0,0.0,0.0};
-    double cpu_time_used_fminknap[5] =  {0.0,0.0,0.0,0.0,0.0};
-    double opt_time_total = 0;
-    double fminknap_time_total = 0;
-    
-    double res1[5] = {0.0,0.0,0.0,0.0,0.0}; // algorithm with subset-sum
-    double res2[5] = {0.0,0.0,0.0,0.0,0.0};
-    //---
 
     // execution ---
 
-    // BINARYKNAPSACK
-    
+    printf("typename,original,columOpt_prealloc,columOpt_prealloc_V1,fminknap,resOpt,resFmin\n");
     for(;typeCount<5; typeCount++){
-        
-        // calcola colonne con minknap
         char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
-        //build filename
         strcat(instanceFilename0, filesPath);
         strcat(instanceFilename0, allTypes[typeCount][0]);
+
+        // lettura di un'istanza
         double *profits;               
         int *weights;
         int n = 0;
         readValues_d_i(instanceFilename0, &profits, &weights, &n);
+        
+        ///--- Calcolo colonne ottimizzate
+        int *t_v1 = NULL;
+        int *s_v1 = NULL;
+        int t_size_v1 = 0;
+        int s_size_v1 = 0;
+        minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
 
-        int *t;
-        int *s;
-        int t_size;
-        int s_size;
-        minCap_opt(weights, n, &t, &t_size, &s, &s_size, capacity);
-        //printf(".");
-        for(size_t i=0; i<allTypesSizes[typeCount]; i++){
-            
+        int *t = NULL;
+        int *s = NULL;
+        int t_size = 0;
+        int s_size = 0;
+        int threshold = 1;
+        minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, threshold);
+        ////---
+
+        // printf("told:\nt: %d; s: %d\ntnew:\nt: %d; s:%d\n", t_size_v1, s_size_v1, t_size, s_size);
+
+        for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
             char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
-            //build filename
             strcat(instanceFilename, filesPath);
             strcat(instanceFilename, allTypes[typeCount][i]);
             
-            // BINARYKNAPSACK
-            // readValues_d_i(instanceFilename, &profits, &weights, &n);
+        // BINARYKNAPSACK ----
+            readValues_d_i(instanceFilename, &profits, &weights, &n);
 
-            // int *x2 = calloc(n, sizeof(int));
 
-            // double **mat_ks2;
-            // ks2_di_alloc(n, s_size, &mat_ks2);
+         //columOpt_prealloc
+            int *x2 = calloc(n, sizeof(int));
 
-            // start = clock();
-            // //ks2_di(profits, weights, capacity, n, t_size, t, s_size, s, x2);
-            // //ks2_d(profits, weights, capacity, n, x2);
-            // ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);
-            // end = clock();
-            // cpu_time_used_opt[typeCount] += ((double) (end - start)) / CLOCKS_PER_SEC;
+            double **mat_ks2;
 
-            // //res1
-            // for(int k=0; k<n; k++)
-            //     res1[typeCount] += x2[k]*profits[k];
+            start = clock();
+            ks2_di_alloc(n, s_size, &mat_ks2); // alloc
+            end = clock();
+            double time_ks2_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            start = clock();
+            ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2); // ks
+            end = clock();
+            double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+          //res1
+            double resOpt = 0;
+            for(int k=0; k<n; k++)
+                resOpt += x2[k]*profits[k];
+
+         //columOpt_prealloc_V1
+            int *x2_v1 = calloc(n, sizeof(int));
+            double **mat_ks2_v1;
+
+            start = clock();
+            ks2_di_alloc(n, s_size_v1, &mat_ks2_v1);
+            end = clock();
+            double time_ks2_v1_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            start = clock();
+            //ks2_di(profits, weights, capacity, n, t_size, t, s_size, s, x2);
+            //ks2_d(profits, weights, capacity, n, x2);
+            ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1);
+            end = clock();
             
-            // FMINKNAP ----
+            double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+          //resv1
+            double resOpt_v1 = 0;
+            for(int k=0; k<n; k++)
+                resOpt_v1 += x2_v1[k]*profits[k];
+
+            
+
+         // columOpt_V1_nocol_noalloc
+            int *x2_v1_nocol_noalloc = calloc(n, sizeof(int));
+
+            start = clock();
+            //ks2_d(profits, weights, capacity, n, x2_v1_nocol_noalloc);
+            end = clock();
+            
+            double time_ks2_v1_nocol_noalloc = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            
+
+          // original
+            int *x_original = calloc(n, sizeof(int));
+
+            start = clock();
+            ks2_d(profits, weights, capacity, n, x_original);
+            end = clock();
+
+            double time_original = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+
+        // FMINKNAP ----
             
             itype *p_fminknap;              //profitti
             itype *w_fminknap;              //pesi 
             int *x;                         //solution vector
             SolutionList *s_list;           
-            int z = 0;                      //optimal objective value
+            //int z = 0;                      //optimal objective value
             x = calloc(n, sizeof(int));
             readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
             openPisinger(n);
             start = clock();
             minknap(&s_list, n, p_fminknap, w_fminknap, x, capacity);
             end = clock();
-            cpu_time_used_fminknap[typeCount] += ((double) (end - start)) / CLOCKS_PER_SEC;  
+            double time_fminknap = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            double resFmin = 0;
             for(int k=0; k<n; k++)
-                res2[typeCount] += x[k]*profits[k];
+                resFmin += x[k]*profits[k];
+        //
+            puts("res:");
+            printa(x2, n);
+            printa(x, n);
+            puts("");
+            //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
+            printf("%s,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], time_original, time_ks2, time_ks2_v1, time_fminknap, resOpt_v1, resOpt, resFmin);
         }
 
     }
@@ -696,8 +949,8 @@ int main(int argc, char *argv[]) {
     printf("capacity:                                    %d\n", capacity);
     */
     //printf("typename, columOpt, fminknap\n");
-    for(int i=0; i<5; i++){
-        printf("%s, %f, %f\n", allTypesNames[i],  cpu_time_used_opt[i], cpu_time_used_fminknap[i]); 
-    }
+    // for(int i=0; i<5; i++){
+    //     printf("%s,%f,%f\n", allTypesNames[i],  cpu_time_used_opt[i], cpu_time_used_fminknap[i]); 
+    // }
     return 0;
 }
