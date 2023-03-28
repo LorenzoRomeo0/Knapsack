@@ -4,6 +4,10 @@
 #include <sys/time.h>
 #include <string.h>
 
+
+/*
+ * https://literateprograms.org/box-muller_transform__c_.html
+ */
 double rand_normal(double mean, double stddev) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -77,7 +81,10 @@ void derive_int_instances(char* filename, int instance_n){
             //printf("%d\n", random_nr);
             random_nr = (random_nr<0)?-random_nr:random_nr;
             sscanf(line, "%5d %5d %5d", &a, &b, &c);
-            //fprintf(new_fp, "%5d %5d %f\n", a, b, c*random_nr);
+            
+            b = (b<0)? -b:b;
+            c = (c<0)? -c:c;
+
             fprintf(new_fp, "%5d %lf %5d\n", a, ((double)b)*random_nr, c);
             //fprintf(new_fp, "%5d %lf %5d\n", a, (double)b, c*random_nr);
         }
