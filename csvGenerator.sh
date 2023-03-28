@@ -26,7 +26,8 @@ filenames="./generator/files/derived/int/"
 #newfilename="./csv/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
 # newfilename="./csv/csv_test1.csv"
 #newfilename="./csv/csv_test2.csv"
-newfilename="./csv/buffer.txt"
+# newfilename="./csv/buffer.txt"
+newfilename="./csv/csv_test3.csv"
 
 #### generator
 cd generator
