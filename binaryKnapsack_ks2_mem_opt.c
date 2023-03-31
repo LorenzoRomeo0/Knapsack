@@ -3276,6 +3276,3 @@ int main1(int argc, char *argv[]) {
     
     return 0;
 }
-
-
-//aggiungere colonna con numeri ripetuti
