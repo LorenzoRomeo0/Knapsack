@@ -743,9 +743,11 @@ int minCapv2_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int
     //capacity = (computedCapacity<capacity)?capacity:computedCapacity;
     // puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");
     // printf("cap: %d, n:%d, computed:%d\n", capacity, n, computedCapacity);
-
+//puts("ok°°°°°°°°°°°");
     *t_size = capacity+1;
+    
     *t = calloc(*t_size, sizeof(int));
+    //printf("++%d\n", *t_size);
     *t1 = calloc(*t_size, sizeof(int));
     //*s = calloc(*t_size, sizeof(int));
     //printa(*t, *t_size);
@@ -1284,7 +1286,6 @@ void ks2_di_prealloc_1(double *profits, int *weights, int capacity, int n, int t
             //printf(" j:%d, w=%d, p=%d, clm=%d, cfr=%d oldVal=%lf\n", j, w, p, clm, cfr, 0);
             //printf(" -j:%d, w=%d, p=%d, clm=%d, cfr=%d, clm-w=%d, prevCol=%d\n", j, w, p, clm, cfr, clm - w, prevCol);
             double oldVal = 0;
-
             if((clm - w) >= 0){
                 oldVal = (t[clm - w] == -1 && i > 0) ? mat[i-1][t1[clm - w]] : (cfr > 0 && i > 0) ? mat[i-1][cfr] : 0;
             }
@@ -1687,7 +1688,7 @@ int main(int argc, char *argv[]) {
         }
     
     }else if(testmode == 2){    // 2: column optimization (confronto della riduzione del numero delle colonne degli algoritmi di ottimizzazione delle colonne)
-        printf("t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
+        printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
@@ -1725,7 +1726,8 @@ int main(int argc, char *argv[]) {
             double mincapv2_time = ((double) (end - start)) / CLOCKS_PER_SEC;
             ////---
 
-            printf("%d,%d,%d,%d,%f,%f\n", t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
+            printf("%s,                      %d,      %d,%d,        %d,     %d,        %d,     %f,%f\n", allTypesNames[typeCount],capacity,n, t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
+            //      allTypesNames[typeCount],capacity,n, t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
         }
 
     }else if(testmode == 3){    // 3: approximated (confronto con gli algoritmi approssimati con divisione dei pesi o esclusione delle colonne)
@@ -1918,7 +1920,7 @@ int main(int argc, char *argv[]) {
         }
     
     }else if(testmode == 4){    // 4: approximated column optimization (confronto della riduzione delle colonne con gli algoritmi approssimati)
-        printf("t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
+        printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
@@ -1958,7 +1960,7 @@ int main(int argc, char *argv[]) {
             double mincapv2_time = ((double) (end - start)) / CLOCKS_PER_SEC;
             ////----------------------------------------------------------------------------------------------
 
-            printf("%d,%d,%d,%d,%f,%f\n", t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
+            printf("%s,                      %d,      %d,%d,        %d,     %d,        %d,     %f,%f\n", allTypesNames[typeCount],capacity,n, t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
         }
     
     }
@@ -1968,7 +1970,7 @@ int main(int argc, char *argv[]) {
 
 //gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ./generator/files/derived/int/ 50000
 
-int main_(int argc, char *argv[]) {
+int main___(int argc, char *argv[]) {
 
     if(argc < 3) {
         printf("Please specify the pathname and the capacity of the knapsack:\nbinaryKnapsack2a generator/files/derived/int 100");
@@ -3116,6 +3118,161 @@ int main__(int argc, char *argv[]) {
         }
     
     }
+    
+    return 0;
+}
+
+int main1(int argc, char *argv[]) {
+
+    if(argc < 3) {
+        printf("Please specify the pathname and the capacity of the knapsack:\nbinaryKnapsack2a generator/files/derived/int 100");
+        exit(EXIT_FAILURE);
+    }
+    int capacity = atoi(argv[2]);       //knapsack capacity
+    char* filesPath = argv[1];          //instances path
+
+    /* testmodes:
+        0: full (esecuzione di tutti gli algoritmi risolutivi)
+        1: optimized (esecuzione di tutti gli algoritmi con ottimizzazione delle colonne e fminknap)
+        2: column optimization (confronto della riduzione del numero delle colonne degli algoritmi di ottimizzazione delle colonne)
+        3: approximated (confronto con gli algoritmi approssimati con divisione dei pesi o esclusione delle colonne)
+        4: approximated column optimization (confronto della riduzione delle colonne con gli algoritmi approssimati)
+    */
+
+    
+    // instance types initialization ---
+    char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
+    int fileNr = getFilenames(filesPath, MAX_FILES, filenames);
+    
+    char **uncorr = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t uncorrSize;
+    getFnmatch(filenames, uncorr, fileNr, &uncorrSize, "uncorr*");
+
+    char **alm = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t almSize;
+    getFnmatch(filenames, alm, fileNr, &almSize, "alm*");
+
+    char **inv = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t invSize;
+    getFnmatch(filenames, inv, fileNr, &invSize, "inv*");
+
+    char **str = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t strSize;
+    getFnmatch(filenames, str, fileNr, &strSize, "str*");
+
+    char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t weakSize;
+    getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
+    
+    char** allTypes[] = {uncorr, alm, inv, str, weak};
+    char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
+    size_t allTypesSizes[] = {uncorrSize, almSize, invSize, strSize, weakSize};
+    int typeCount = 0;
+    //---
+
+    // clock initialization ---
+
+    clock_t start, end;
+
+    // execution ---
+
+        //printf("t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
+        for(;typeCount<5; typeCount++){
+            char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
+            strcat(instanceFilename0, filesPath);
+            strcat(instanceFilename0, allTypes[typeCount][0]);
+
+            // lettura di un'istanza
+            double *profits;               
+            int *weights;
+            int n = 0;
+            readValues_d_i(instanceFilename0, &profits, &weights, &n);
+            
+            ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
+            int testmode = 0;
+            int cut_threshold = 2;
+            int division_value = 100;
+
+            // divisione pesi per micapv1
+            int *dividedWeights = calloc(n, sizeof(int));
+            int value = 0;
+            for(int i=0; i<n; i++){
+                value = ceil(weights[i]/division_value);
+                dividedWeights[i] = (value > 0)? value: 1;
+            }
+
+            puts("weights:");
+            printa(weights, n);
+            puts("divided weights:");
+            printa(dividedWeights,n);
+
+            // v1   --
+            int *t_v1 = NULL;
+            int *s_v1 = NULL;
+            int t_size_v1 = 0;
+            int s_size_v1 = 0;
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            
+            puts("v1:");
+            printf("s_size: %d\n", s_size_v1);
+            printa(s_v1, s_size_v1);
+
+            // v2   --
+            int *t = NULL;
+            int *s = NULL;
+            int t_size = 0;
+            int s_size = 0;
+            minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, 1);
+
+            puts("v2:");
+            printf("s_size: %d\n", s_size);
+            printa(s, s_size);
+
+            // v1 1 --
+            int *t_v1_1 = NULL;
+            int *t1_v1_1 = NULL;
+            int *s_v1_1 = NULL;
+            int t_size_v1_1 = 0;
+            int s_size_v1_1 = 0;
+            minCap_opt_1(dividedWeights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);  
+
+
+            puts("v1 div:");
+            printf("s_size: %d\n", s_size_v1);
+            printa(s_v1_1, s_size_v1_1);
+
+            //printa(weights, n);
+            // printf("%d\n", cut_threshold);
+            // printf("%d\n", capacity);
+            // v2 1  --
+            int *t_1 = NULL;
+            int *t1_1 = NULL;
+            int *s_1 = NULL;
+            int t_size_1 = 0;
+            int s_size_1 = 0;
+            minCapv2_1(weights, n, &t_1, &t1_1, &t_size_1, &s_1, &s_size_1, capacity, cut_threshold);
+
+            puts("v2 cut:");
+            printf("s_size: %d\n", s_size_1);
+            printa(s_1, s_size_1);
+
+            puts("...");
+            //printf("s_div: %d, s_cut: %d\n", s_size_v1, s_size);
+
+            //printf("%d,%d,%d,%d\n", t_size_v1, t_size, s_size_v1, s_size);
+            free(t_v1);
+            free(s_v1);
+            free(s);
+            free(t);
+            free(s_v1_1);
+            free(t_v1_1);
+            free(t1_v1_1);
+            free(t_1);
+            free(t1_1);
+            free(s_1);
+            
+        }
+
     
     return 0;
 }
