@@ -1515,7 +1515,7 @@ int main(int argc, char *argv[]) {
                 int *x2_v1_nocol_noalloc = calloc(n, sizeof(int));
 
                 start = clock();
-                ks2_d(profits, weights, capacity, n, x2_v1_nocol_noalloc);                          //ks
+                //ks2_d(profits, weights, capacity, n, x2_v1_nocol_noalloc);                          //ks
                 end = clock();
                 double time_ks2_v1_nocol_noalloc = ((double) (end - start)) / CLOCKS_PER_SEC;
 
@@ -1523,7 +1523,7 @@ int main(int argc, char *argv[]) {
                 int *x_original = calloc(n, sizeof(int));
 
                 start = clock();
-                ks2_d(profits, weights, capacity, n, x_original);                                   //ks
+                ks_d(profits, weights, capacity, n, x_original);                                   //ks
                 end = clock();
                 double time_original = ((double) (end - start)) / CLOCKS_PER_SEC;
 
@@ -1749,21 +1749,24 @@ int main(int argc, char *argv[]) {
             
             // divisione pesi per micapv1
             int *dividedWeights = calloc(n, sizeof(int));
-            for(int i=0; i<n; i++) dividedWeights[i] = ceil(weights[i]/division_value);
-
+            int value = 0;
+            for(int i=0; i<n; i++){
+                value = ceil(weights[i]/division_value);
+                dividedWeights[i] = (value > 0)? value: 1;
+            }
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
 
             // v2   --
             int *t = NULL;
             int *s = NULL;
             int t_size = 0;
             int s_size = 0;
-            minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, cut_threshold);
+            minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, 1);
 
             // v1 1 --
             int *t_v1_1 = NULL;

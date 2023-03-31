@@ -21,20 +21,20 @@ gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack 
 for a in {1...1...1}
 do
     # n=${i}
-    n=500
-    range=1000
+    n=1000
+    range=1200
         
     instanceNr=1
-    capacity=1000
+    capacity=1200  
 
     # n=10  
     # range=50
     # instanceNr=1
     # capacity=20
 
-    mode=2
-    division=10
-    cut=20
+    mode=0
+    division=1
+    cut=1
 
     filenames="./generator/files/derived/int/"
 
@@ -44,7 +44,7 @@ do
     #confronto tempi colonne
     #newfilename="./csv/opt_col/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
     #newfilename="./csv/columns/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
-    newfilename="./csv/columns/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    newfilename="./csv/ks/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
 
     #newfilename="./csv/columns/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
     # newfilename="./csv/csv_test1.csv"
