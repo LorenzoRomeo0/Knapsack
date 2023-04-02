@@ -18,23 +18,24 @@ gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack 
 # instanceNr=1
 # capacity=10
 #for range in {10..1000..10}
-for a in {1...1...1}
+#for cut in {10..100..10}
+for a in {1..1..1}
 do
+    echo ${cut}
     # n=${i}
-    n=1000
-    range=1200
-        
-    instanceNr=1
-    capacity=1200  
+    n=100
+    range=5000
+    instanceNr=100
+    capacity=5000
 
     # n=10  
     # range=50
     # instanceNr=1
     # capacity=20
 
-    mode=0
-    division=1
-    cut=1
+    mode=4
+    division=10
+    cut=10
 
     filenames="./generator/files/derived/int/"
 
@@ -44,7 +45,9 @@ do
     #confronto tempi colonne
     #newfilename="./csv/opt_col/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
     #newfilename="./csv/columns/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
-    newfilename="./csv/ks/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/ks/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/columns_t/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    newfilename="./csv/approx/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
 
     #newfilename="./csv/columns/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
     # newfilename="./csv/csv_test1.csv"
@@ -86,12 +89,12 @@ do
     ####
 
     #### RUNV4
-    echo "gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ${filenames} ${capacity} ${mode} ${division} ${cut}"
+    echo "gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ${filenames} ${capacity} ${mode} ${cut} ${division}"
     echo "generating ${newfilename}"
     echo "please wait..."
 
     #gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack $filenames $capacity > $newfilename
-    ./binaryKnapsack $filenames $capacity $mode $division $cut > $newfilename
+    ./binaryKnapsack $filenames $capacity $mode $cut $division > $newfilename
     ####
 
     echo "done."
@@ -99,5 +102,8 @@ do
 
     # sh ./runv4.sh > ./csv/csv_c50000_n20_r30000_fn100.csv
 done
+
+echo "copying..."
 cp -r ./csv/* /mnt/c/Users/loren/Desktop/Tesi/jupyter/csv/
+echo "ok."
 exit
