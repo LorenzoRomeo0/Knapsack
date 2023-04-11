@@ -17,25 +17,37 @@ gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack 
 # range=3
 # instanceNr=1
 # capacity=10
-#for range in {10..1000..10}
+#for i in {1..1000..10}
 #for cut in {10..100..10}
-for a in {1..1..1}
+#for a in {1..1..1}
+#for i in {1000..10000..100}
+#array=(10010 20010 50010 100010)
+#for i in "${array[@]}"
+#array=(2000 3000 50000 100000)
+#for i in "${array[@]}"
+for i in {5000..5000..5000}
 do
-    echo ${cut}
-    # n=${i}
-    n=100
-    range=5000
+    n=$(($i/2))
+    #n=100
+    #range=50000
+    range=${i}
     instanceNr=100
-    capacity=5000
+    #instanceNr=${i}
+    #capacity=50000
+    capacity=${i}
+    #capacity=${a}
 
     # n=10  
-    # range=50
-    # instanceNr=1
-    # capacity=20
+    # range=50000
+    # instanceNr=100
+    # capacity=50000
 
-    mode=4
+    mode=0
     division=10
-    cut=10
+    cut=30
+    # mode=0
+    # division=100
+    # cut=30
 
     filenames="./generator/files/derived/int/"
 
@@ -47,7 +59,13 @@ do
     #newfilename="./csv/columns/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
     #newfilename="./csv/ks/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
     #newfilename="./csv/columns_t/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
-    newfilename="./csv/approx/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/approx/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/all_instance_size/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/all_instance_nr/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/all/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/all_instance_cap/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    newfilename="./csv/all_instance_cap_size/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
+    #newfilename="./csv/tests_div_example/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
 
     #newfilename="./csv/columns/csv_c${capacity}_n${n}_r${range}_fn${instanceNr}_mode${mode}_div${division}_cut${cut}.csv"
     # newfilename="./csv/csv_test1.csv"
@@ -56,7 +74,7 @@ do
     #newfilename="./csv/csv_test3.csv"
     #newfilename="./csv/mincap_test.csv"
 
-    #### generator
+    #### generazione delle istanze
     cd generator
     gcc derived_instance_generator_int.c -o derived_instance_generator_int -lm
 
@@ -88,7 +106,7 @@ do
     cd ..
     ####
 
-    #### RUNV4
+    #### Esecuzione degli algoritmi risolutivi per le istanze
     echo "gcc binaryKnapsack_ks2_mem_opt.c -Ilibs -Llibs -lfminknap_npg -o binaryKnapsack -lm && ./binaryKnapsack ${filenames} ${capacity} ${mode} ${cut} ${division}"
     echo "generating ${newfilename}"
     echo "please wait..."

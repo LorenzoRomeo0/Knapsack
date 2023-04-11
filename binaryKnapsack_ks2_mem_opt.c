@@ -52,19 +52,19 @@ void readitypeValues(char* filename, itype **profits, itype **weights, int *size
     // Read items nr
     int itemsNr = 0;
     read = getline(&line, &len, fp);
-    
+
     sscanf(line, "%d", &itemsNr);
     *size = itemsNr;
-    
+
     *profits = calloc(*size, sizeof(itype));
     *weights = calloc(*size, sizeof(itype));
-    
+
     if (fp == NULL)
         exit(EXIT_FAILURE);
     while ((read = getline(&line, &len, fp)) != -1 && itemsNr--) {
         sscanf(line, "%5d %lf %5d", &a, &b, &c);
         (*profits)[a-1] =  b;
-        (*weights)[a-1] = (itype) c; 
+        (*weights)[a-1] = (itype) c;
         //printf("%d) %f ", a, (*profits)[a-1]);
     }
 
@@ -89,13 +89,13 @@ void readValues_d_i(char* filename, double **profits, int **weights, int *size){
     // Read items nr
     int itemsNr = 0;
     read = getline(&line, &len, fp);
-    
+
     sscanf(line, "%d", &itemsNr);
     *size = itemsNr;
-    
+
     *profits = calloc(*size, sizeof(itype));
     *weights = calloc(*size, sizeof(int));
-    
+
     if (fp == NULL) {
         printf("Failed to open file.\n");
         free(*profits);
@@ -113,7 +113,7 @@ void readValues_d_i(char* filename, double **profits, int **weights, int *size){
     while ((read = getline(&line, &len, fp)) != -1 && itemsNr--) {
         sscanf(line, "%5d %lf %5d", &a, &b, &c);
         (*profits)[a-1] = b;
-        (*weights)[a-1] = c; 
+        (*weights)[a-1] = c;
     }
 
     if (ferror(fp)) {
@@ -136,7 +136,7 @@ int getFilenames(char* dirname, int maxFiles, char *filenames[maxFiles]){
 
     // Open the directory
     DIR *dir = opendir(dirname);
-    
+
     if (dir == NULL) {
         perror("opendir");
         return 1;
@@ -150,7 +150,7 @@ int getFilenames(char* dirname, int maxFiles, char *filenames[maxFiles]){
             continue;
         }
         fileNr++;
-        
+
         // Allocate memory for the filename and copy it into the array
         filenames[i] = malloc(strlen(entry->d_name) + 1);
         strcpy(filenames[i], entry->d_name);
@@ -203,7 +203,7 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
             }else if(mat[i-1][j] > mat[i-1][j-w]+p){
                 mat[i][j] = mat[i-1][j];
             }else{
-                mat[i][j] = mat[i-1][j-w]+p; 
+                mat[i][j] = mat[i-1][j-w]+p;
             }
         }
     }
@@ -216,7 +216,7 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
         if(mat[i][indexWeight] != mat[i-1][indexWeight]){
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;      
+            indexWeight = remainingCapacity;
         }
     }
 
@@ -237,7 +237,7 @@ void ks_d(double *profits, int *weights, int capacity, int n, int* x){
     for(int j = 0; j < capacity+1; j++) printf("%3d ", j);
     printf("\n");
     for(int j = 0; j < capacity+1; j++) printf("%3s","_");
-    printf("\n");    
+    printf("\n");
 
     printm_d(n+1, capacity+1, mat);
     printf("\n");
@@ -304,7 +304,7 @@ void ks_d_prealloc(double *profits, int *weights, int capacity, int n, double **
             }else if(mat[i-1][j] > mat[i-1][j-w]+p){
                 mat[i][j] = mat[i-1][j];
             }else{
-                mat[i][j] = mat[i-1][j-w]+p; 
+                mat[i][j] = mat[i-1][j-w]+p;
             }
         }
     }
@@ -317,7 +317,7 @@ void ks_d_prealloc(double *profits, int *weights, int capacity, int n, double **
         if(mat[i][indexWeight] != mat[i-1][indexWeight]){
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;      
+            indexWeight = remainingCapacity;
         }
     }
 
@@ -338,7 +338,7 @@ void ks_d_prealloc(double *profits, int *weights, int capacity, int n, double **
     for(int j = 0; j < capacity+1; j++) printf("%3d ", j);
     printf("\n");
     for(int j = 0; j < capacity+1; j++) printf("%3s","_");
-    printf("\n");    
+    printf("\n");
 
     printm_d(n+1, capacity+1, mat);
     printf("\n");
@@ -363,7 +363,7 @@ void ks_d_prealloc(double *profits, int *weights, int capacity, int n, double **
 int minCap_opt(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity) {
     // calcolo della dimensione di t
     int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    for(int i=0; i<n; i++) computedCapacity+=weights[i];
     //capacity = (computedCapacity>capacity)?capacity:computedCapacity;
     // *t_size = capacity+1;
     *t_size = capacity+1;
@@ -380,7 +380,6 @@ int minCap_opt(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
     // for(int i = 0; i<n+1;i++) c2[i] = 0;
 
     for(int i=0; i<n+1; i++){
-        //for(int j=0; j<capacity+1; j++){
         for(int j=0; j<computedCapacity+1; j++){
 
             int w = (i == 0)? 0 : weights[i-1];
@@ -389,12 +388,12 @@ int minCap_opt(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
                 current[j] = 0;
             }else if(i == 0){
                 current[j] = capacity+1;
-            } else if(j-w < 0){ 
+            } else if(j-w < 0){
                 current[j] = prev[j];
             }else if(prev[j] < current[j-w]+w ){
                 current[j] = prev[j];
             } else{
-                current[j] = prev[j-w]+w; 
+                current[j] = prev[j-w]+w;
             }
         // printf("%3d ", current[j]);
         }
@@ -423,11 +422,11 @@ int minCap_opt(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
     // for(int i=0; i< (*t_size); i++) (*t) = 0;
     // for(int i=0; i< (*s_size); i++) (*s) = 0;
 
-    
+
 
     int counter = 0;
     int s_cont = 0;
-    
+
     for(int i=0; i<capacity+1; i++){
         if(prev[i] <= capacity){
             (*t)[i] = counter++;
@@ -446,7 +445,7 @@ int minCap_opt(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
 int minCap_opt_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int *s_size, int capacity) {
     // calcolo della dimensione di t
     int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    for(int i=0; i<n; i++) computedCapacity+=weights[i];
     //capacity = (computedCapacity>capacity)?capacity:computedCapacity;
     // *t_size = capacity+1;
     *t_size = capacity+1;
@@ -472,12 +471,12 @@ int minCap_opt_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, i
                 current[j] = 0;
             }else if(i == 0){
                 current[j] = capacity+1;
-            } else if(j-w < 0){ 
+            } else if(j-w < 0){
                 current[j] = prev[j];
             }else if(prev[j] < current[j-w]+w ){
                 current[j] = prev[j];
             } else{
-                current[j] = prev[j-w]+w; 
+                current[j] = prev[j-w]+w;
             }
         // printf("%3d ", current[j]);
         }
@@ -507,7 +506,7 @@ int minCap_opt_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, i
     // for(int i=0; i< (*t_size); i++) (*t) = 0;
     // for(int i=0; i< (*s_size); i++) (*s) = 0;
 
-    
+
 
     int counter = 0;
     int s_cont = 0;
@@ -529,23 +528,157 @@ int minCap_opt_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, i
     return capacity+1;
 }
 
+int minCap_opt_1_divided(int *weights, int **dividedWeights, int n, int **t, int **t1, int *t_size, int **s, int *s_size, int capacity, int *dividedCapacity, int division_value) {
+    //division_value=10;
+
+    (*dividedCapacity) = ceil(capacity/division_value);
+    if(*dividedCapacity<1) (*dividedCapacity) = 1;
+    (*dividedWeights) = calloc(n+1, sizeof(int));
+    int currentWeight = 0;
+    for(int i=0; i<n; i++){
+        currentWeight = ceil(weights[i]/division_value);
+        (*dividedWeights)[i] = (currentWeight>0)?currentWeight:1;
+    }
+    
+
+    // puts("--weights:");
+    // printa(weights,n);
+    // puts("--divided:");
+    // printa(*dividedWeights, n);
+    
+    // calcolo della dimensione di t
+    int computedCapacity = 0;
+    for(int i=0; i<n; i++) computedCapacity += (*dividedWeights)[i];
+
+    *t_size = (*dividedCapacity)+1;
+    // puts("\n\n--compcap:");
+    // printf("%d\n", computedCapacity);
+    // puts("--cap:");
+    // printf("%d\n",capacity);
+
+    //capacity = (computedCapacity>capacity)?capacity:computedCapacity;
+    // *t_size = capacity+1;
+    // int aux1 = capacity;
+    // capacity = (computedCapacity<capacity)?computedCapacity:capacity;
+    // computedCapacity = aux1;
+    // *t_size = capacity+1;
+
+    
+
+
+
+    // Costruzione degli array che simulano la tabella di memoizzazione
+    int *c1 = (int*) calloc(computedCapacity+1, sizeof(int));
+    int *c2 = (int*) calloc(computedCapacity+1, sizeof(int));
+
+    int *prev = c2;
+    int *current = c1;
+    int *aux;
+
+    // for(int i = 0; i<n+1;i++) c1[i] = 0;
+    // for(int i = 0; i<n+1;i++) c2[i] = 0;
+
+    for(int i=0; i<n+1; i++){
+        //for(int j=0; j<capacity+1; j++){
+        for(int j=0; j<computedCapacity+1; j++){
+
+            int w = (i == 0)? 0 :  (*dividedWeights)[i-1];
+
+            if(j == 0){
+                current[j] = 0;
+            }else if(i == 0){
+                current[j] = (*dividedCapacity)+1;
+            } else if(j-w < 0){
+                current[j] = prev[j];
+            }else if(prev[j] < current[j-w]+w ){
+                current[j] = prev[j];
+            } else{
+                current[j] = prev[j-w]+w;
+            }
+        //  printf("%3d ", current[j]);
+        }
+        // puts("");
+        aux = current;
+        current = prev;
+        prev = aux;
+    }
+
+    
+//puts("§");
+    // Build result arrays
+    *s_size = 0;
+
+    int cfr = (computedCapacity < (*dividedCapacity) )? computedCapacity+1: (*dividedCapacity)+1;
+    for(int i=0; i<cfr; i++)
+        if(prev[i] <= (*dividedCapacity)) (*s_size)++;
+    // for(int i=0; i<(*dividedCapacity)+1; i++)
+    //     if(prev[i] <= (*dividedCapacity)) (*s_size)++;
+
+
+    *t = NULL;
+    *s = NULL;
+    *t = calloc(*t_size, sizeof(int));
+    *t1 = calloc(*t_size, sizeof(int));
+    *s = calloc(*s_size, sizeof(int));
+
+    // for(int i=0; i<(*s_size); i++) (*s)[i] = 1;
+
+    // *t = malloc((*t_size)* sizeof(int));
+    // *s = malloc((*s_size)* sizeof(int));
+    // for(int i=0; i< (*t_size); i++) (*t) = 0;
+    // for(int i=0; i< (*s_size); i++) (*s) = 0;
+
+    int counter = 0;
+    int s_cont = 0;
+    int lastValue = 0;
+    for(int i=0; i<(*dividedCapacity)+1; i++){
+        if(prev[i] <= (*dividedCapacity)){
+            (*t)[i] = counter++;
+            lastValue = (*t)[i];
+            (*s)[s_cont++] = i;
+        }else{
+            (*t)[i] = -1;
+        }
+        (*t1)[i] = lastValue;
+    }
+
+    for(int i=cfr; i<(*dividedCapacity)+1; i++){
+        (*t)[i] = -1;
+    }
+
+
+    // printf("t_size: %d\n", *t_size);
+    // printa(*t, *t_size);
+    // puts("---");
+    // printf("s_size: %d\n", *s_size);
+    // printa(*s, *s_size);
+
+    // puts("----\n\n");
+    // printa(c2, computedCapacity+1);
+
+    // rilascio della memoria dedicata agli array
+    free(prev);
+    free(current);
+    return (*dividedCapacity)+1;
+}
+
 
 int minCapv2_(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity) {
     int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    for(int i=0; i<n; i++) computedCapacity+=weights[i];
     capacity = (computedCapacity<capacity)?capacity:computedCapacity;
 
     *t_size = capacity+1;
 
     // Build table
-    
+
     uint *c1 = (uint*) calloc(capacity+1, sizeof(uint));
     uint *c2 = (uint*) calloc(capacity+1, sizeof(uint));
 
     uint *prev = c2;
     uint *current = c1;
     uint *aux;
-    
+
     // for(int i = 0; i<n+1;i++) c1[i] = 0;
     // for(int i = 0; i<n+1;i++) c2[i] = 0;
 
@@ -564,11 +697,11 @@ int minCapv2_(int *weights, int n, int **t, int *t_size, int **s, int *s_size, i
         aux = current;
         current = prev;
         prev = aux;
-        
+
         //printa(current, n+1);
     }
 
-    
+
     // Build result arrays
 
     int threshold = 1;
@@ -577,12 +710,12 @@ int minCapv2_(int *weights, int n, int **t, int *t_size, int **s, int *s_size, i
     for(int i=0; i<capacity+1; i++)
         if(prev[i] > 0) (*s_size)++;
 
-    
+
     *t = calloc(*t_size, sizeof(int));
     *s = calloc(*s_size, sizeof(int));
     int counter = 0;
     int s_cont = 0;
-    
+
     for(int i=0; i<capacity+1; i++){
         if(prev[i] >= threshold){
             (*t)[i] = counter++;
@@ -591,7 +724,7 @@ int minCapv2_(int *weights, int n, int **t, int *t_size, int **s, int *s_size, i
             (*t)[i] = -1;
         }
     }
-    
+
     //free
 
     free(c1);
@@ -601,20 +734,20 @@ int minCapv2_(int *weights, int n, int **t, int *t_size, int **s, int *s_size, i
 
 int minCapv2__(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, int threshold) {
     int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    for(int i=0; i<n; i++) computedCapacity+=weights[i];
     //capacity = (computedCapacity<capacity)?capacity:computedCapacity;
 
     *t_size = capacity+1;
 
     // Build table
-    
+
     uint *c1 = (uint*) calloc(computedCapacity+1, sizeof(uint));
     uint *c2 = (uint*) calloc(computedCapacity+1, sizeof(uint));
 
     uint *prev = c2;
     uint *current = c1;
     uint *aux;
-    
+
     // for(int i = 0; i<n+1;i++) c1[i] = 0;
     // for(int i = 0; i<n+1;i++) c2[i] = 0;
 
@@ -633,11 +766,11 @@ int minCapv2__(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
         aux = current;
         current = prev;
         prev = aux;
-        
+
         //printa(current, n+1);
     }
 
-    
+
     // Build result arrays
 
     *s_size = 0;
@@ -656,7 +789,7 @@ int minCapv2__(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
     *s = calloc(*s_size, sizeof(int));
     int counter = 0;
     int s_cont = 0;
-    
+
     for(int i=0; i<capacity+1; i++){
         if(prev[i] >= threshold){
             (*t)[i] = counter++;
@@ -665,7 +798,7 @@ int minCapv2__(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
             (*t)[i] = -1;
         }
     }
-    
+
     //free
     free(c1);
     free(c2);
@@ -674,31 +807,31 @@ int minCapv2__(int *weights, int n, int **t, int *t_size, int **s, int *s_size, 
 
 int minCapv2___(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, int threshold) {
     int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    for(int i=0; i<n; i++) computedCapacity+=weights[i];
     //capacity = (computedCapacity<capacity)?capacity:computedCapacity;
     // puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");
     // printf("cap: %d, n:%d, computed:%d\n", capacity, n, computedCapacity);
-    
+
     *t_size = capacity+1;
     *t = calloc(*t_size, sizeof(int));
     //*s = calloc(*t_size, sizeof(int));
     //printa(*t, *t_size);
     // Build table
-    
+
     uint *c1 = (uint*) calloc(computedCapacity+1, sizeof(uint));
     uint *c2 = (uint*) calloc(computedCapacity+1, sizeof(uint));
 
     uint *prev = c2;
     uint *current = c1;
     uint *aux;
-    
+
     // for(int i = 0; i<n+1;i++) c1[i] = 0;
     // for(int i = 0; i<n+1;i++) c2[i] = 0;
 
     printf("n=%d, computed=%d\n", n, computedCapacity);
 
     for(int i=0; i<n; i++){
-        
+
         int w = (i==0)? 0: weights[i-1];
         current[w] = prev[w] + 1;
         printf("w = %d, i=%d, current[w]=%d\n", w, i, current[w]);
@@ -714,13 +847,13 @@ int minCapv2___(int *weights, int n, int **t, int *t_size, int **s, int *s_size,
         aux = current;
         current = prev;
         prev = aux;
-        
+
         //printa(current, computedCapacity);
         // for(int k=0; k<computedCapacity; k++) printf("%d ", current[k]);
         // puts("-");
     }
-    
-    
+
+
     // Build result arrays
 
     *s_size = 0;
@@ -733,7 +866,7 @@ int minCapv2___(int *weights, int n, int **t, int *t_size, int **s, int *s_size,
 
     int counter = 0;
     int s_cont = 0;
-    
+
     for(int i=0; i<capacity+1; i++){
         if(prev[i] >= threshold){
             (*t)[i] = counter++;
@@ -742,7 +875,7 @@ int minCapv2___(int *weights, int n, int **t, int *t_size, int **s, int *s_size,
             (*t)[i] = -1;
         }
     }
-    
+
     //free
     free(c1);
     free(c2);
@@ -751,7 +884,7 @@ int minCapv2___(int *weights, int n, int **t, int *t_size, int **s, int *s_size,
 
 int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, int capacity, int threshold) {
     int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    for(int i=0; i<n; i++) computedCapacity+=weights[i];
     //capacity = (computedCapacity<capacity)?capacity:computedCapacity;
     // puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");
     // printf("cap: %d, n:%d, computed:%d\n", capacity, n, computedCapacity);
@@ -768,7 +901,7 @@ int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, in
     ulong *prev = c2;
     ulong *current = c1;
     ulong *aux;
-    
+
     // for(int i = 0; i<n+1;i++) c1[i] = 0;
     // for(int i = 0; i<n+1;i++) c2[i] = 0;
 
@@ -777,7 +910,7 @@ int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, in
     // printf("n=%d, computed=%d\n", n, computedCapacity);
 
     for(int i=0; i<n; i++){
-       
+
         int w = (i==0)? 0: weights[i-1];
 
         // printf("w = %d, prev[w] = %ld, current[w] = %ld\n", w, prev[w], current[w]);
@@ -792,16 +925,16 @@ int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, in
             //printf(" prev[j] = %ld, prev[j-w]=%ld, j-w=%d\n", prev[j], prev[j-w], j-w);
             current[j] = prev[j] + prev[j-w];
         }
-        
+
         // for(int k=0; k<computedCapacity+1; k++) printf("%3ld ", current[k]);
         // puts("");
         aux = current;
         current = prev;
         prev = aux;
-        
-        
+
+
     }
-    
+
     free(current);
     // Build result arrays
     //puts("helo");
@@ -815,14 +948,14 @@ int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, in
     }
     //puts("helo1");
 
-    
+
     //printf("---- s:%d t:%d\n", *s_size, *t_size);
 
     *s = calloc(*s_size, sizeof(int));
 
     int counter = 0;
     int s_cont = 0;
-    
+
     for(int i=0; i<cfr; i++){
         if(prev[i] >= threshold){
             (*t)[i] = counter++;
@@ -835,8 +968,7 @@ int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, in
     for(int i=cfr; i<capacity+1; i++){
         (*t)[i] = -1;
     }
-    *s_size = s_cont;
-    
+
     //free
     //free(c1);
     //free(c2);
@@ -846,13 +978,13 @@ int minCapv2(int *weights, int n, int **t, int *t_size, int **s, int *s_size, in
 
 int minCapv2_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int *s_size, int capacity, int threshold) {
     int computedCapacity = 0;
-    for(int i=0; i<n; i++) computedCapacity+=weights[i]; 
+    for(int i=0; i<n; i++) computedCapacity+=weights[i];
     //capacity = (computedCapacity<capacity)?capacity:computedCapacity;
     // puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");puts("ok");
     // printf("cap: %d, n:%d, computed:%d\n", capacity, n, computedCapacity);
 //puts("ok°°°°°°°°°°°");
     *t_size = capacity+1;
-    
+
     *t = calloc(*t_size, sizeof(int));
     //printf("++%d\n", *t_size);
     *t1 = calloc(*t_size, sizeof(int));
@@ -866,7 +998,7 @@ int minCapv2_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int
     ulong *prev = c2;
     ulong *current = c1;
     ulong *aux;
-    
+
     // for(int i = 0; i<n+1;i++) c1[i] = 0;
     // for(int i = 0; i<n+1;i++) c2[i] = 0;
 
@@ -875,7 +1007,7 @@ int minCapv2_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int
     // printf("n=%d, computed=%d\n", n, computedCapacity);
 
     for(int i=0; i<n; i++){
-       
+
         int w = (i==0)? 0: weights[i-1];
 
         // printf("w = %d, prev[w] = %ld, current[w] = %ld\n", w, prev[w], current[w]);
@@ -890,16 +1022,16 @@ int minCapv2_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int
             //printf(" prev[j] = %ld, prev[j-w]=%ld, j-w=%d\n", prev[j], prev[j-w], j-w);
             current[j] = prev[j] + prev[j-w];
         }
-        
+
         // for(int k=0; k<computedCapacity+1; k++) printf("%3ld ", current[k]);
         // puts("");
         aux = current;
         current = prev;
         prev = aux;
-        
-        
+
+
     }
-    
+
     free(current);
     // Build result arrays
     //puts("helo");
@@ -913,8 +1045,8 @@ int minCapv2_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int
     }
     //puts("helo1");
 
-    
-    //printf("---- s:%d t:%d\n", *s_size, *t_size);
+// printf("++s_size: %d\n", *s_size);
+// printf("---- s:%d t:%d\n", *s_size, *t_size);
 
     *s = calloc(*s_size, sizeof(int));
 
@@ -935,8 +1067,9 @@ int minCapv2_1(int *weights, int n, int **t, int **t1, int *t_size, int **s, int
     for(int i=cfr; i<capacity+1; i++){
         (*t)[i] = -1;
     }
-    *s_size = s_cont;
-    
+
+// printf("-1--- s:%d t:%d\n", *s_size, *t_size);
+
     //free
     free(prev);
     return capacity+1;
@@ -969,45 +1102,18 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
 
     for(int i = 0; i<n+1; i++)
         for(int j=0; j<s_size; j++) mat[i][j] = 0;
-    
-    // for(int i = 0; i < n+1; i++){
-    //     for(int j = 0; j < s_size; j++){
-            
-    //         int w = (i == 0)? 0 : weights[i-1];
-    //         float p = (i == 0)? 0 : profits[i-1];
-    //         int clm = s[j];                                 
-    //         int cfr = (clm - w < 0)? -2 : t[clm - w];
-    //         int prevCol = -1;
-            
-    //         if((clm - w) >= 0)
-    //             for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
 
-    //         double oldVal = (t[clm - w] == -1 && i != 0)? mat[i-1][t[prevCol]]: mat[i-1][cfr];
-            
-    //         if(i == 0 || j == 0) mat[i][j] = 0;
-    //         else if(cfr == -2){
-    //             mat[i][j] = mat[i-1][j];   
-    //         }else if(t[clm - w]<0 && mat[i-1][j] == 0){
-    //             mat[i][j] = profits[0];
-    //         }else if(mat[i-1][j] > oldVal+p){ 
-                 
-    //             mat[i][j] = mat[i-1][j];
-    //         } else{
-    //             mat[i][j] = oldVal+p; 
-    //         }
-    //     }
-    // }
     for(int i = 0; i < n+1; i++){
         for(int j = 0; j < s_size; j++){
             int w = (i == 0)? 0 : weights[i-1];
             float p = (i == 0)? 0 : profits[i-1];
-            int clm = s[j];                                 
+            int clm = s[j];
             int cfr = (clm - w < 0)? -2 : t[clm - w];
             int prevCol = -1;
-            
+
             if((clm - w) >= 0)
                 for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
-            
+
             // printf("i = %d, j = %d\n", i, j);
             // printf("cfr = %d\n", cfr);
             // printf("t[clm-w] = %d - clm = %d, w = %d\n", t[clm-w], clm, w);
@@ -1015,19 +1121,19 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
 
             double oldVal = (t[clm - w] == -1 && i > 0)? mat[i-1][t[prevCol]]: (cfr>0 && i>0)? mat[i-1][cfr]:0;
             //il problema avviene dopo questo punto, prova a stampare i valori
-            
+
 
 
             if(i == 0 || j == 0) mat[i][j] = 0;
             else if(cfr == -2){
-                mat[i][j] = mat[i-1][j];   
+                mat[i][j] = mat[i-1][j];
             }else if(t[clm - w]<0 && mat[i-1][j] == 0){
                 mat[i][j] = profits[0];
-            }else if(mat[i-1][j] > oldVal+p){ 
-                 
+            }else if(mat[i-1][j] > oldVal+p){
+
                 mat[i][j] = mat[i-1][j];
             } else{
-                mat[i][j] = oldVal+p; 
+                mat[i][j] = oldVal+p;
             }
         }
     }
@@ -1039,14 +1145,14 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
             indexWeight--;
             i++;
             continue;
-        } 
+        }
         if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;      
+            indexWeight = remainingCapacity;
         }
     }
-    
+
     // Result visualization
 
     #ifdef SHOWMAT
@@ -1060,7 +1166,7 @@ void ks2_d(double *profits, int *weights, int capacity, int n, int* x){
         printm_d(n+1, s_size, mat);
         printf("\n");
     #endif
-    
+
     for(int i=0; i<n+1; i++){
         free(mat[i]);
     }
@@ -1098,18 +1204,18 @@ void ks2_di(double *profits, int *weights, int capacity, int n, int t_size, int 
 
     for(int i = 0; i<n+1; i++)
         for(int j=0; j<s_size; j++) mat[i][j] = 0;
-    
+
     for(int i = 0; i < n+1; i++){
         for(int j = 0; j < s_size; j++){
             int w = (i == 0)? 0 : weights[i-1];
             float p = (i == 0)? 0 : profits[i-1];
-            int clm = s[j];                                 
+            int clm = s[j];
             int cfr = (clm - w < 0)? -2 : t[clm - w];
             int prevCol = -1;
-            
+
             if((clm - w) >= 0)
                 for(prevCol=(clm-w); t[prevCol] == -1; prevCol--){}
-            
+
             // printf("i = %d, j = %d\n", i, j);
             // printf("cfr = %d\n", cfr);
             // printf("t[clm-w] = %d - clm = %d, w = %d\n", t[clm-w], clm, w);
@@ -1117,19 +1223,19 @@ void ks2_di(double *profits, int *weights, int capacity, int n, int t_size, int 
 
             double oldVal = (t[clm - w] == -1 && i > 0)? mat[i-1][t[prevCol]]: (cfr>0 && i>0)? mat[i-1][cfr]:0;
             //il problema avviene dopo questo punto, prova a stampare i valori
-            
+
 
 
             if(i == 0 || j == 0) mat[i][j] = 0;
             else if(cfr == -2){
-                mat[i][j] = mat[i-1][j];   
+                mat[i][j] = mat[i-1][j];
             }else if(t[clm - w]<0 && mat[i-1][j] == 0){
                 mat[i][j] = profits[0];
-            }else if(mat[i-1][j] > oldVal+p){ 
-                 
+            }else if(mat[i-1][j] > oldVal+p){
+
                 mat[i][j] = mat[i-1][j];
             } else{
-                mat[i][j] = oldVal+p; 
+                mat[i][j] = oldVal+p;
             }
         }
     }
@@ -1142,14 +1248,14 @@ void ks2_di(double *profits, int *weights, int capacity, int n, int t_size, int 
             indexWeight--;
             i++;
             continue;
-        } 
+        }
         if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;      
+            indexWeight = remainingCapacity;
         }
     }
-    
+
     // Result visualization
 
     #ifdef SHOWMAT
@@ -1218,14 +1324,14 @@ printf("ks: tsize: %d, s_size: %d, n: %d, capac: %d\n", t_size, s_size, n, capac
         for(int j = 0; j < s_size; j++){
             int w = (i == 0) ? 0 : weights[i-1];
             float p = (i == 0) ? 0 : profits[i-1];
-            int clm = s[j];                     
+            int clm = s[j];
             int cfr = (clm - w < 0) ? -2 : t[clm - w];
             int prevCol = -1;
 
             // printf("j = %d, s[j]=%d, clm = %d, w=%d, clm-w=%d\n", j, s[j],clm, w, clm-w);
             //printf(" j:%d, w=%d, p=%d, clm=%d, cfr=%d oldVal=%lf\n", j, w, p, clm, cfr, 0);
             //printf(" -j:%d, w=%d, p=%d, clm=%d, cfr=%d, clm-w=%d, prevCol=%d\n", j, w, p, clm, cfr, clm - w, prevCol);
-            
+
             if((clm - w) >= 0){
                 for(prevCol=(clm-w); t[prevCol] == -1 && prevCol>=0; prevCol--){}
             }
@@ -1240,14 +1346,14 @@ printf("ks: tsize: %d, s_size: %d, n: %d, capac: %d\n", t_size, s_size, n, capac
             //printf(" -j:%d, w=%d, p=%d, clm=%d, cfr=%d, clm-w=%d, prevCol=%d\n", j, w, p, clm, cfr, clm - w, prevCol);
             double oldVal = (t[clm - w] == -1 && i > 0) ? mat[i-1][t[prevCol]] : (cfr > 0 && i > 0) ? mat[i-1][cfr] : 0;
             // puts("5");
-            
+
             if(i == 0 || j == 0) mat[i][j] = 0;
             else if(cfr == -2){
-                mat[i][j] = mat[i-1][j];   
-            }else if(mat[i-1][j] > oldVal+p){ 
+                mat[i][j] = mat[i-1][j];
+            }else if(mat[i-1][j] > oldVal+p){
                 mat[i][j] = mat[i-1][j];
             } else{
-                mat[i][j] = oldVal+p; 
+                mat[i][j] = oldVal+p;
             }
         }
     }
@@ -1260,14 +1366,14 @@ printf("ks: tsize: %d, s_size: %d, n: %d, capac: %d\n", t_size, s_size, n, capac
             indexWeight--;
             i++;
             continue;
-        } 
+        }
         if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;      
+            indexWeight = remainingCapacity;
         }
     }
-    
+
     // Result visualization
 
     #ifdef SHOWMAT
@@ -1306,7 +1412,7 @@ void ks2_di_prealloc(double *profits, int *weights, int capacity, int n, int t_s
     //printf(" s-size %d:\n", s_size);
     // printa(s, s_size);
     // puts("++");
-    
+
     // trivial solution check
     int sumWeights = 0;
     for(int i=0; i<n; i++) sumWeights+=weights[i];
@@ -1322,15 +1428,15 @@ void ks2_di_prealloc(double *profits, int *weights, int capacity, int n, int t_s
         for(int j = 0; j < s_size; j++){
             int w = (i == 0) ? 0 : weights[i-1];
             float p = (i == 0) ? 0 : profits[i-1];
-            int clm = s[j];                     
+            int clm = s[j];
             int cfr = (clm - w < 0) ? -2 : t[clm - w];
             int prevCol = -1;
 
             //printf("j = %d, s[j]=%d, clm = %d, w=%d, clm-w=%d\n", j, s[j],clm, w, clm-w);
-            
+
             //printf(" j:%d, w=%d, p=%d, clm=%d, cfr=%d oldVal=%lf\n", j, w, p, clm, cfr, 0);
             //printf(" -j:%d, w=%d, p=%d, clm=%d, cfr=%d, clm-w=%d, prevCol=%d\n", j, w, p, clm, cfr, clm - w, prevCol);
-            
+
             double oldVal = 0;
 
             if((clm - w) >= 0){
@@ -1349,14 +1455,14 @@ void ks2_di_prealloc(double *profits, int *weights, int capacity, int n, int t_s
             //printf(" -j:%d, w=%d, p=%d, clm=%d, cfr=%d, clm-w=%d, prevCol=%d\n", j, w, p, clm, cfr, clm - w, prevCol);
             //double oldVal = (t[clm - w] == -1 && i > 0) ? mat[i-1][t[prevCol]] : (cfr > 0 && i > 0) ? mat[i-1][cfr] : 0;
             // puts("5");
-            
+
             if(i == 0 || j == 0) mat[i][j] = 0;
             else if(cfr == -2){
-                mat[i][j] = mat[i-1][j];   
-            }else if(mat[i-1][j] > oldVal+p){ 
+                mat[i][j] = mat[i-1][j];
+            }else if(mat[i-1][j] > oldVal+p){
                 mat[i][j] = mat[i-1][j];
             }else{
-                mat[i][j] = oldVal+p; 
+                mat[i][j] = oldVal+p;
             }
         }
     }
@@ -1368,14 +1474,14 @@ void ks2_di_prealloc(double *profits, int *weights, int capacity, int n, int t_s
             indexWeight--;
             i++;
             continue;
-        } 
+        }
         if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;      
+            indexWeight = remainingCapacity;
         }
     }
-    
+
     // Result visualization
 
     #ifdef SHOWMAT
@@ -1414,7 +1520,7 @@ void ks2_di_prealloc_1(double *profits, int *weights, int capacity, int n, int t
     //printf(" s-size %d:\n", s_size);
     // printa(s, s_size);
     // puts("++");
-    
+
     // trivial solution check
     int sumWeights = 0;
     for(int i=0; i<n; i++) sumWeights+=weights[i];
@@ -1429,11 +1535,11 @@ void ks2_di_prealloc_1(double *profits, int *weights, int capacity, int n, int t
         for(int j = 0; j < s_size; j++){
             int w = (i == 0) ? 0 : weights[i-1];
             float p = (i == 0) ? 0 : profits[i-1];
-            int clm = s[j];                     
+            int clm = s[j];
             int cfr = (clm - w < 0) ? -2 : t[clm - w];
 
             //printf("j = %d, s[j]=%d, clm = %d, w=%d, clm-w=%d\n", j, s[j],clm, w, clm-w);
-            
+
             //printf(" j:%d, w=%d, p=%d, clm=%d, cfr=%d oldVal=%lf\n", j, w, p, clm, cfr, 0);
             //printf(" -j:%d, w=%d, p=%d, clm=%d, cfr=%d, clm-w=%d, prevCol=%d\n", j, w, p, clm, cfr, clm - w, prevCol);
             double oldVal = 0;
@@ -1451,14 +1557,14 @@ void ks2_di_prealloc_1(double *profits, int *weights, int capacity, int n, int t
             //printf(" -j:%d, w=%d, p=%d, clm=%d, cfr=%d, clm-w=%d, prevCol=%d\n", j, w, p, clm, cfr, clm - w, prevCol);
             //double oldVal = (t[clm - w] == -1 && i > 0) ? mat[i-1][t[prevCol]] : (cfr > 0 && i > 0) ? mat[i-1][cfr] : 0;
             // puts("5");
-            
+
             if(i == 0 || j == 0) mat[i][j] = 0;
             else if(cfr == -2){
-                mat[i][j] = mat[i-1][j];   
-            }else if(mat[i-1][j] > oldVal+p){ 
+                mat[i][j] = mat[i-1][j];
+            }else if(mat[i-1][j] > oldVal+p){
                 mat[i][j] = mat[i-1][j];
             }else{
-                mat[i][j] = oldVal+p; 
+                mat[i][j] = oldVal+p;
             }
         }
     }
@@ -1470,14 +1576,14 @@ void ks2_di_prealloc_1(double *profits, int *weights, int capacity, int n, int t
             indexWeight--;
             i++;
             continue;
-        } 
+        }
         if(mat[i][t[indexWeight]] != mat[i-1][t[indexWeight]]){
             x[i-1] = 1;
             remainingCapacity -= weights[i-1];
-            indexWeight = remainingCapacity;      
+            indexWeight = remainingCapacity;
         }
     }
-    
+
     // Result visualization
 
     #ifdef SHOWMAT
@@ -1536,8 +1642,8 @@ int main(int argc, char *argv[]) {
     */
 
     int testmode = (argc > 3)? atoi(argv[3]):0;
-    int cut_threshold = ((testmode == 3 || testmode == 4) && argc > 4)? atoi(argv[4]):1;
-    int division_value = ((testmode == 3 || testmode == 4) && argc > 4)? atoi(argv[5]):1;
+    int cut_threshold = (argc > 3)? atoi(argv[4]):1;
+    int division_value = (argc > 4)? atoi(argv[5]):1;
 
     // printf("test: %d\n", testmode);
     // printf("cut: %d\n", cut_threshold);
@@ -1546,7 +1652,7 @@ int main(int argc, char *argv[]) {
     // instance types initialization ---
     char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
     int fileNr = getFilenames(filesPath, MAX_FILES, filenames);
-    
+
     char **uncorr = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t uncorrSize;
     getFnmatch(filenames, uncorr, fileNr, &uncorrSize, "uncorr*");
@@ -1566,7 +1672,7 @@ int main(int argc, char *argv[]) {
     char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t weakSize;
     getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
-    
+
     char** allTypes[] = {uncorr, alm, inv, str, weak};
     char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
     size_t allTypesSizes[] = {uncorrSize, almSize, invSize, strSize, weakSize};
@@ -1578,181 +1684,26 @@ int main(int argc, char *argv[]) {
     clock_t start, end;
 
     // execution ---
-
-    // if(testmode == 0){          // 0: full (esecuzione di tutti gli algoritmi risolutivi)
-    //     //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
-    //     printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-    //     for(;typeCount<5; typeCount++){
-    //         char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
-    //         strcat(instanceFilename0, filesPath);
-    //         strcat(instanceFilename0, allTypes[typeCount][0]);
-
-    //         // lettura di un'istanza
-    //         double *profits;               
-    //         int *weights;
-    //         int n = 0;
-    //         readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
-    //         ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-    //         //printf("ok");
-    //         // v1   --
-    //         int *t_v1 = NULL;
-    //         int *s_v1 = NULL;
-    //         int t_size_v1 = 0;
-    //         int s_size_v1 = 0;
-    //         minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
-
-    //         // v2   --
-    //         int *t = NULL;
-    //         int *s = NULL;
-    //         int t_size = 0;
-    //         int s_size = 0;
-    //         int threshold = 1;
-    //         minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, threshold);
-            
-    //         ////---                             -------------------------------------------------------------------------------------------
-
-    //         // printf("told:\nt: %d; s: %d\ntnew:\nt: %d; s:%d\n", t_size_v1, s_size_v1, t_size, s_size);
-
-    //         for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
-    //             char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
-    //             strcat(instanceFilename, filesPath);
-    //             strcat(instanceFilename, allTypes[typeCount][i]);
-                
-    //         // BINARYKNAPSACK ----
-    //             readValues_d_i(instanceFilename, &profits, &weights, &n);
-
-    //         //columOpt_prealloc             -------------------------------------------------------------------------------------------
-    //             int *x2 = calloc(n, sizeof(int));
-    //             double **mat_ks2 = NULL;
-
-    //             start = clock();
-    //             ks2_di_alloc(n, s_size, &mat_ks2);                                                  // alloc
-    //             end = clock();
-    //             double time_ks2_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-    //             start = clock();
-    //             ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
-    //             end = clock();
-    //             double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
-    //             double resOpt = 0;                                                                  //res1
-    //             for(int k=0; k<n; k++)
-    //                 resOpt += x2[k]*profits[k];
-
-    //             ks2_di_free(n, &mat_ks2);                                                           // free
-
-    //         //columOpt_prealloc_V1          -------------------------------------------------------------------------------------------
-    //             int *x2_v1 = calloc(n, sizeof(int));
-    //             double **mat_ks2_v1 = NULL;
-
-    //             start = clock();
-    //             ks2_di_alloc(n, s_size_v1, &mat_ks2_v1);                                            //alloc
-    //             end = clock();
-    //             double time_ks2_v1_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-    //             start = clock();
-    //             ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
-    //             end = clock();
-    //             double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-    //             double resOpt_v1 = 0;                                                               //resv1 
-    //             for(int k=0; k<n; k++)
-    //                 resOpt_v1 += x2_v1[k]*profits[k];
-
-    //             ks2_di_free(n, &mat_ks2_v1);                                                        //free
-
-    //         // columOpt_V1_nocol_noalloc    -------------------------------------------------------------------------------------------
-    //             int *x2_v1_nocol_noalloc = calloc(n, sizeof(int));
-
-    //             start = clock();
-    //             //ks2_d(profits, weights, capacity, n, x2_v1_nocol_noalloc);                          //ks
-    //             end = clock();
-    //             double time_ks2_v1_nocol_noalloc = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-    //         // original                     -------------------------------------------------------------------------------------------
-    //             int *x_original = calloc(n, sizeof(int));
-
-    //             start = clock();
-    //             ks_d(profits, weights, capacity, n, x_original);                                   //ks
-    //             end = clock();
-    //             double time_original = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-
-    //         // FMINKNAP                     -------------------------------------------------------------------------------------------
-    //             itype *p_fminknap = NULL;              //profitti
-    //             itype *w_fminknap = NULL;              //pesi 
-    //             int *x = calloc(n, sizeof(int));       //solution vector
-    //             SolutionList *s_list = NULL;           
-    //             //int z = 0;                      //optimal objective value
-
-    //             readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
-
-    //             openPisinger(n);                                                                    //alloc
-
-    //             start = clock();
-    //             minknap(&s_list, n, p_fminknap, w_fminknap, x, capacity);                           //ks
-    //             end = clock();
-    //             double time_fminknap = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-    //             double resFmin = 0;                                                                 //resFmin
-    //             for(int k=0; k<n; k++)
-    //                 resFmin += x[k]*profits[k];
-    //         //  -----------------------------------------------------------------------------------------------------------------------            
-
-    //             //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
-    //             printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], time_original, time_ks2,              time_ks2_v1,              time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
-    //             //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-            
-    //         // FREE                         -------------------------------------------------------------------------------------------
-    //             free(x2);
-    //             free(x2_v1);
-    //             free(x2_v1_nocol_noalloc);
-    //             free(x_original);
-    //             free(x);
-    //             free(profits);
-    //             free(weights);
-    //             free(p_fminknap);
-    //             free(w_fminknap);
-    //             free(s_list);
-    //         }
-    //     }
     if(testmode == 0){          // 0: full (esecuzione di tutti gli algoritmi risolutivi)
-        //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
-        //printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,t_size_v1_div,t_size_v2_cut,s_sizev1_div,s_size_v2_cut,time_v1,time_v2,time_v1_div,time_v2_cut,time_original_prealloc,time_ks2_v1_1,time_ks2_v2_1,time_ks2_v1_1_div,time_ks2_v2_1_cut,res_original_alloc,resOpt_v1_1,resOpt_v2_1,resOpt_v1_1_div,resOpt_v2_1_cut\n");
-        //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-        //printf("type,capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size_v2,s_size_v2,mincap_v2_time,t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,time_original_prealloc,res_original_alloc,time_ks2_v2_allocation,time_ks2_v2,resOpt_v2,time_ks2_v1_allocation,time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin");
         printf("type,capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size_v2,s_size_v2,mincap_v2_time,");
         printf("t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,");
         printf("mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,");
         printf("time_original_prealloc,res_original_alloc,time_ks2_v2_allocation,time_ks2_v2,resOpt_v2,time_ks2_v1_allocation,");
         printf("time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,");
-        printf("resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin");
-        printf("\n");
-        //puts("ok");
+        printf("resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,time_ks2_v2_1_cut,");
+        printf("resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
-            // divisione pesi per micapv1
-            int *dividedWeights = calloc(n, sizeof(int));
-            int currentWeight = 0;
-            start = clock();
-            for(int i=0; i<n; i++){
-                currentWeight = ceil(weights[i]/division_value);
-                dividedWeights[i] = (currentWeight>0)?currentWeight:1;
-            }
-            end = clock();
-            double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;;
 
             // v1   --
             int *t_v1 = NULL;
@@ -1760,7 +1711,830 @@ int main(int argc, char *argv[]) {
             int t_size_v1 = 0;
             int s_size_v1 = 0;
             start = clock();
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
+            end = clock();
+            double mincap_v1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+       
+            // v2   --
+            int *t = NULL;
+            int *s = NULL;
+            int t_size = 0;
+            int s_size = 0;
+            start = clock();
+            minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, 1);
+            end = clock();
+            double mincap_v2_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // v1 t'  --
+            int *t_v1_1 = NULL;
+            int *t1_v1_1 = NULL;
+            int *s_v1_1 = NULL;
+            int t_size_v1_1 = 0;
+            int s_size_v1_1 = 0;
+            start = clock();
+            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1,  &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
+            end = clock();
+            double mincap_v1_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // v2 t'  --
+            int *t_v2_1 = NULL;
+            int *t1_v2_1 = NULL;
+            int *s_v2_1 = NULL;
+            int t_size_v2_1 = 0;
+            int s_size_v2_1 = 0;
+
+            start = clock();
+            minCapv2_1(weights, n, &t_v2_1, &t1_v2_1, &t_size_v2_1, &s_v2_1, &s_size_v2_1, capacity, 1);
+            end = clock();
+            double mincap_v2_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            int *dividedWeights = NULL;
+            int *t_v1_1_div = NULL;
+            int *t1_v1_1_div = NULL;
+            int *s_v1_1_div = NULL;
+            int t_size_v1_1_div = 0;
+            int s_size_v1_1_div = 0;
+            int dividedCapacity = 0;
+            start = clock();
+            minCap_opt_1_divided(weights, &dividedWeights, n, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity, &dividedCapacity, division_value);
+            end = clock();
+            double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+    
+            // v2 cut  --
+            int *t_v2_1_cut = NULL;
+            int *t1_v2_1_cut = NULL;
+            int *s_v2_1_cut = NULL;
+            int t_size_v2_1_cut = 0;
+            int s_size_v2_1_cut = 0;
+
+            start = clock();
+            minCapv2_1(weights, n, &t_v2_1_cut, &t1_v2_1_cut, &t_size_v2_1_cut, &s_v2_1_cut, &s_size_v2_1_cut, capacity, cut_threshold);
+            end = clock();
+            double mincap_v2_1_cut_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            ////----------------------------------------------------------------------------------------------
+
+            for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
+                char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
+                strcat(instanceFilename, filesPath);
+                strcat(instanceFilename, allTypes[typeCount][i]);
+
+            // BINARYKNAPSACK ----
+                readValues_d_i(instanceFilename, &profits, &weights, &n);
+
+            // original                         -------------------------------------------------------------------------------------------
+                int *x_original = calloc(n, sizeof(int));
+
+                start = clock();
+                ks_d(profits, weights, capacity, n, x_original);                                   
+                end = clock();
+                double time_original = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+
+            // original alloc                    -------------------------------------------------------------------------------------------
+                int *x_original_alloc = calloc(n, sizeof(int));
+
+                double **mat_original = NULL;
+                start = clock();
+                ks_d_alloc(n, capacity, &mat_original);
+                end = clock();
+                double time_original_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks_d_prealloc(profits, weights, capacity, n, mat_original, x_original_alloc);                                  
+                end = clock();
+                double time_original_prealloc = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double res_original_alloc = 0;                                                               
+                for(int k=0; k<n; k++)
+                    res_original_alloc += x_original_alloc[k]*profits[k];
+
+                ks_d_free(n, &mat_original);                               
+
+
+            //columOpt_prealloc  (micapv2)          -------------------------------------------------------------------------------------------
+                int *x2 = calloc(n, sizeof(int));
+                double **mat_ks2 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size, &mat_ks2);                                                  
+                end = clock();
+                double time_ks2_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  
+                end = clock();
+                double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt = 0;                                                                  
+                for(int k=0; k<n; k++)
+                    resOpt += x2[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2);
+                                                                         
+            //columOpt_prealloc_V1    (micapv1)      -------------------------------------------------------------------------------------------
+                int *x2_v1 = calloc(n, sizeof(int));
+                double **mat_ks2_v1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v1, &mat_ks2_v1);                                           
+                end = clock();
+                double time_ks2_v1_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); 
+                end = clock();
+                double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v1 = 0;                                                               
+                for(int k=0; k<n; k++)
+                    resOpt_v1 += x2_v1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_v1);
+
+            //columOpt_prealloc_V1    (micapv1 + t')      -------------------------------------------------------------------------------------------
+                int *x2_v1_1 = calloc(n, sizeof(int));
+                double **mat_ks2_v1_1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v1_1, &mat_ks2_v1_1);                                           
+                end = clock();
+                double time_ks2_v1_allocation_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_v1_1, t_v1_1, t1_v1_1, s_size_v1_1, s_v1_1, mat_ks2_v1_1, x2_v1_1); 
+                end = clock();
+                double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v1_1 = 0;                                                               
+                for(int k=0; k<n; k++)
+                    resOpt_v1_1 += x2_v1_1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_v1_1);                                                      
+
+            //columOpt_prealloc_v2  (micapv2 + t')       -------------------------------------------------------------------------------------------
+                int *x2_1 = calloc(n, sizeof(int));
+                double **mat_ks2_1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v2_1, &mat_ks2_1);                                                  
+                end = clock();
+                double time_ks2_v2_allocation_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_v2_1, t_v2_1, t1_v2_1, s_size_v2_1, s_v2_1, mat_ks2_1, x2_1);  
+                end = clock();
+                double time_ks2_v2_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v2_1 = 0;                                                                  
+                for(int k=0; k<n; k++)
+                    resOpt_v2_1 += x2_1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_1);                                                           
+
+            //columOpt_prealloc_V1    (micapv1 + t' + div)      -------------------------------------------------------------------------------------------
+                int *x2_v1_1_div = calloc(n, sizeof(int));
+                double **mat_ks2_v1_1_div = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v1_1_div, &mat_ks2_v1_1_div);                                            
+                end = clock();
+                double time_ks2_v1_allocation_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, dividedWeights, dividedCapacity, n, t_size_v1_1_div, t_v1_1_div, t1_v1_1_div, s_size_v1_1_div, s_v1_1_div, mat_ks2_v1_1_div, x2_v1_1_div);
+                end = clock();
+                double time_ks2_v1_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v1_1_div = 0;                                                               
+                for(int k=0; k<n; k++)
+                    resOpt_v1_1_div += x2_v1_1_div[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_v1_1_div);                                                      
+
+
+            //columOpt_prealloc_v2  (micapv2 + t'+ cut)       -------------------------------------------------------------------------------------------
+                int *x2_1_cut = calloc(n, sizeof(int));
+                double **mat_ks2_1_cut = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v2_1_cut, &mat_ks2_1_cut);                                                  
+                end = clock();
+                double time_ks2_allocation_1_cut = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_v2_1_cut, t_v2_1_cut, t1_v2_1_cut, s_size_v2_1_cut, s_v2_1_cut, mat_ks2_1_cut, x2_1_cut);  
+                end = clock();
+                double time_ks2_v2_1_cut = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v2_1_cut = 0;                                                                  
+                for(int k=0; k<n; k++)
+                    resOpt_v2_1_cut += x2_1_cut[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_1_cut);
+
+
+            // columOpt_V1_nocol_noalloc    -------------------------------------------------------------------------------------------
+                int *x2_v1_nocol_noalloc = calloc(n, sizeof(int));
+
+                start = clock();
+                //ks2_d(profits, weights, capacity, n, x2_v1_nocol_noalloc);                         
+                end = clock();
+                double time_ks2_v1_nocol_noalloc = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // FMINKNAP                     -------------------------------------------------------------------------------------------
+                itype *p_fminknap = NULL;              //profitti
+                itype *w_fminknap = NULL;              //pesi
+                int *x = calloc(n, sizeof(int));       //solution vector
+                SolutionList *s_list = NULL;
+
+                readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
+
+                start = clock();
+                openPisinger(n);                                                                   
+                end = clock();
+                double time_fminknap_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                minknap(&s_list, n, p_fminknap, w_fminknap, x, capacity);                         
+                end = clock();
+                double time_fminknap = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resFmin = 0;                                                                 
+                for(int k=0; k<n; k++)
+                    resFmin += x[k]*profits[k];
+
+            //  -----------------------------------------------------------------------------------------------------------------------
+
+                //printf("    type,                    capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size_v2,s_size_v2,mincap_v2_time,t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,time_original_prealloc,res_original_alloc,time_ks2_v2_allocation,time_ks2_v2,resOpt_v2,time_ks2_v1_allocation,time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin");
+                //            "%s,                     %d,     %d,%f                   ,%d       ,%d       ,%f           ,%d       ,%d        ,%f           ,%d         ,%d         ,%f               ,%d        ,%d          ,%f             ,%d              ,%d            ,%f                  ,%d             ,%d              ,%f                 ,%f            ,%f                      ,%f                    ,%f               ,%f                     ,%f         ,%f       ,%f                    ,%f         ,%f       ,%f                      ,%f            ,%f         ,%f                      ,%f           ,%f          ,%f                        ,%f                ,%f             ,%f                       ,%f            ,%f                        ,%f                     ,%f            ,%f"
+                printf("%s,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",allTypesNames[typeCount],capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size,   s_size,   mincap_v2_time,t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,time_original_prealloc,res_original_alloc,time_ks2_allocation,   time_ks2   ,resOpt,   time_ks2_v1_allocation,time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,time_ks2_v2_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin);
+
+            // FREE                         -------------------------------------------------------------------------------------------
+                free(x_original);
+                free(x_original_alloc);
+                free(x2_v1_1);
+                free(x2);
+                free(x2_v1);
+
+                free(x2_1);
+                free(x2_v1_1_div);
+                free(x2_1_cut);
+                free(x2_v1_nocol_noalloc);
+
+                free(x);
+                free(p_fminknap);
+                free(w_fminknap);
+                free(s_list);
+                free(profits);
+                free(weights);
+            }
+
+            free(t_v1);
+            free(s_v1);
+            free(t);
+            free(s);
+            free(t_v1_1);
+            free(t1_v1_1);
+            free(s_v1_1);
+            free(t_v2_1);
+            free(t1_v2_1);
+            free(s_v2_1);
+            free(t_v1_1_div);
+            free(t1_v1_1_div);
+            free(s_v1_1_div);
+            free(t_v2_1_cut);
+            free(t1_v2_1_cut);
+            free(s_v2_1_cut);
+        }
+    }else if(testmode == 2){    // 2: column optimization (confronto della riduzione del numero delle colonne degli algoritmi di ottimizzazione delle colonne)
+        printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
+        for(;typeCount<5; typeCount++){
+            char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
+            strcat(instanceFilename0, filesPath);
+            strcat(instanceFilename0, allTypes[typeCount][0]);
+
+            // lettura di un'istanza
+            double *profits;
+            int *weights;
+            int n = 0;
+            readValues_d_i(instanceFilename0, &profits, &weights, &n);
+
+            ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
+
+            // v1   --
+            int *t_v1 = NULL;
+            int *s_v1 = NULL;
+            int t_size_v1 = 0;
+            int s_size_v1 = 0;
+
+            start = clock();
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
+            end = clock();
+            double mincap_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // v2   --
+            int *t = NULL;
+            int *s = NULL;
+            int t_size = 0;
+            int s_size = 0;
+            int threshold = 1;
+
+            start = clock();
+            minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, threshold);
+            end = clock();
+            double mincapv2_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+            ////---
+
+            printf("%s,                      %d,      %d,%d,        %d,     %d,        %d,     %f,%f\n", allTypesNames[typeCount],capacity,n, t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
+            //      allTypesNames[typeCount],capacity,n, t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
+        }
+
+    }else if(testmode == 4){    // 4: approximated column optimization (confronto della riduzione delle colonne con gli algoritmi approssimati)
+        printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,t_size_v1_div,t_size_v2_cut,s_sizev1_div,s_size_v2_cut,time_v1,time_v2,time_v1_div,time_v2_cut,time_original_prealloc,time_ks2_v1_1,time_ks2_v2_1,time_ks2_v1_1_div,time_ks2_v2_1_cut,res_original_alloc,resOpt_v1_1,resOpt_v2_1,resOpt_v1_1_div,resOpt_v2_1_cut\n");
+        for(;typeCount<5; typeCount++){
+            char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
+            strcat(instanceFilename0, filesPath);
+            strcat(instanceFilename0, allTypes[typeCount][0]);
+
+            // lettura di un'istanza
+            double *profits;
+            int *weights;
+            int n = 0;
+            readValues_d_i(instanceFilename0, &profits, &weights, &n);
+
+            ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
+
+            // divisione pesi per micapv1
+            // v1   --
+            int *t_v1_1 = NULL;
+            int *t1_v1_1 = NULL;
+            int *s_v1_1 = NULL;
+            int t_size_v1_1 = 0;
+            int s_size_v1_1 = 0;
+            start = clock();
+            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1,  &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
+            end = clock();
+            double mincap_v1_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // v2   --
+            int *t_v2_1 = NULL;
+            int *t1_v2_1 = NULL;
+            int *s_v2_1 = NULL;
+            int t_size_v2_1 = 0;
+            int s_size_v2_1 = 0;
+
+            start = clock();
+            minCapv2_1(weights, n, &t_v2_1, &t1_v2_1, &t_size_v2_1, &s_v2_1, &s_size_v2_1, capacity, 1);
+            end = clock();
+            double mincap_v2_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // v1 div  --
+            int *dividedWeights = NULL;
+            int *t_v1_1_div = NULL;
+            int *t1_v1_1_div = NULL;
+            int *s_v1_1_div = NULL;
+            int t_size_v1_1_div = 0;
+            int s_size_v1_1_div = 0;
+            int dividedCapacity = 0;
+            start = clock();
+            minCap_opt_1_divided(weights, &dividedWeights, n, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity, &dividedCapacity, division_value);
+            end = clock();
+            double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // v2 cut  --
+            int *t_v2_1_cut = NULL;
+            int *t1_v2_1_cut = NULL;
+            int *s_v2_1_cut = NULL;
+            int t_size_v2_1_cut = 0;
+            int s_size_v2_1_cut = 0;
+
+            start = clock();
+            minCapv2_1(weights, n, &t_v2_1_cut, &t1_v2_1_cut, &t_size_v2_1_cut, &s_v2_1_cut, &s_size_v2_1_cut, capacity, cut_threshold);
+            end = clock();
+            double mincap_v2_1_cut_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+            ////----------------------------------------------------------------------------------------------
+
+            for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
+                char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
+                strcat(instanceFilename, filesPath);
+                strcat(instanceFilename, allTypes[typeCount][i]);
+
+            // BINARYKNAPSACK ----
+                readValues_d_i(instanceFilename, &profits, &weights, &n);
+
+            // original alloc                    -------------------------------------------------------------------------------------------
+                int *x_original_alloc = calloc(n, sizeof(int));
+
+                double **mat_original = NULL;
+                ks_d_alloc(n, capacity, &mat_original);
+
+                start = clock();
+                ks_d_prealloc(profits, weights, capacity, n, mat_original, x_original_alloc);                //ks
+                end = clock();
+                double time_original_prealloc = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double res_original_alloc = 0;                                                               //resv1
+                for(int k=0; k<n; k++)
+                    res_original_alloc += x_original_alloc[k]*profits[k];
+
+                ks_d_free(n, &mat_original);
+
+            //columOpt_prealloc_V1    (micapv1 + t')      -------------------------------------------------------------------------------------------
+                int *x2_v1_1 = calloc(n, sizeof(int));
+                double **mat_ks2_v1_1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v1_1, &mat_ks2_v1_1);                                            //alloc
+                end = clock();
+                double time_ks2_v1_allocation_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_v1_1, t_v1_1, t1_v1_1, s_size_v1_1, s_v1_1, mat_ks2_v1_1, x2_v1_1); 
+                end = clock();
+                double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v1_1 = 0;                                                               //resv1
+                for(int k=0; k<n; k++)
+                    resOpt_v1_1 += x2_v1_1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_v1_1);                                                      //free
+
+            //columOpt_prealloc  (micapv2 + t')       -------------------------------------------------------------------------------------------
+                int *x2_1 = calloc(n, sizeof(int));
+                double **mat_ks2_1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v2_1, &mat_ks2_1);                                                  // alloc
+                end = clock();
+                double time_ks2_v2_allocation_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_v2_1, t_v2_1, t1_v2_1, s_size_v2_1, s_v2_1, mat_ks2_1, x2_1);  // ks
+                end = clock();
+                double time_ks2_v2_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v2_1 = 0;                                                                  //res1
+                for(int k=0; k<n; k++)
+                    resOpt_v2_1 += x2_1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_1);                                                           // free
+
+            //columOpt_prealloc_V1    (micapv1 + t' + div)      -------------------------------------------------------------------------------------------
+                int *x2_v1_1_div = calloc(n, sizeof(int));
+                double **mat_ks2_v1_1_div = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v1_1_div, &mat_ks2_v1_1_div);                                            //alloc
+                end = clock();
+                double time_ks2_v1_allocation_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc(profits, dividedWeights, dividedCapacity, n, t_size_v1_1_div, t_v1_1_div, t1_v1_1_div, s_size_v1_1_div, s_v1_1_div, mat_ks2_v1_1_div, x2_v1_1_div); //ks
+                end = clock();
+                double time_ks2_v1_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v1_1_div = 0;                                                               //resv1
+                for(int k=0; k<n; k++)
+                    resOpt_v1_1_div += x2_v1_1_div[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_v1_1_div);                                                      //free
+
+            //columOpt_prealloc  (micapv2 + t'+ cut)       -------------------------------------------------------------------------------------------
+                int *x2_1_cut = calloc(n, sizeof(int));
+                double **mat_ks2_1_cut = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v2_1_cut, &mat_ks2_1_cut);                                                  // alloc
+                end = clock();
+                double time_ks2_allocation_1_cut = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_v2_1_cut, t_v2_1_cut, t1_v2_1_cut, s_size_v2_1_cut, s_v2_1_cut, mat_ks2_1_cut, x2_1_cut);  // ks
+                end = clock();
+                double time_ks2_v2_1_cut = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v2_1_cut = 0;                                                                  //res1
+                for(int k=0; k<n; k++)
+                    resOpt_v2_1_cut += x2_1_cut[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_1_cut);
+
+
+               printf("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount],capacity,n, t_size_v1_1, t_size_v2_1, s_size_v1_1, s_size_v2_1, t_size_v1_1_div, t_size_v2_1_cut,   s_size_v1_1_div, s_size_v2_1_cut, mincap_v1_1_time, mincap_v2_1_time,  mincap_v1_1_div_time, mincap_v2_1_cut_time,time_original_prealloc, time_ks2_v1_1, time_ks2_v2_1, time_ks2_v1_1_div, time_ks2_v2_1_cut, res_original_alloc,resOpt_v1_1,resOpt_v2_1,resOpt_v1_1_div,resOpt_v2_1_cut);
+
+                // free
+                free(x_original_alloc);
+                free(x2_v1_1);
+                free(x2_1);
+                free(x2_v1_1_div);
+                free(x2_1_cut);
+                free(profits);
+                free(weights);
+            }
+
+            // free
+            free(t_v1_1);
+            free(t1_v1_1);
+            free(s_v1_1);
+            free(t_v2_1);
+            free(t1_v2_1);
+            free(s_v2_1);
+            free(t_v1_1_div);
+            free(t1_v1_1_div);
+            free(s_v1_1_div);
+            free(t_v2_1_cut);
+            free(t1_v2_1_cut);
+            free(s_v2_1_cut);
+        }
+
+    }else if(testmode == 5){    // 5: confronto tempi di esecuzione tra column opt e t'
+        printf("typename,s_size_v1,s_size_v2,s_size_v1_1,s_size_v2_1,time_ks2_allocation,time_ks2_v2,time_ks2_v2_allocation_1,time_ks2_v2_1,time_ks2_v1_allocation,time_ks2_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,time_original\n");
+        for(;typeCount<5; typeCount++){
+            char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
+            strcat(instanceFilename0, filesPath);
+            strcat(instanceFilename0, allTypes[typeCount][0]);
+
+            // lettura di un'istanza
+            double *profits;
+            int *weights;
+            int n = 0;
+            readValues_d_i(instanceFilename0, &profits, &weights, &n);
+
+            ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
+            // v1   --
+            int *t_v1 = NULL;
+            int *s_v1 = NULL;
+            int t_size_v1 = 0;
+            int s_size_v1 = 0;
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
+
+            // v2   --
+            int *t = NULL;
+            int *s = NULL;
+            int t_size = 0;
+            int s_size = 0;
+            minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, 1);
+
+            // v1 1 --
+            int *t_v1_1 = NULL;
+            int *t1_v1_1 = NULL;
+            int *s_v1_1 = NULL;
+            int t_size_v1_1 = 0;
+            int s_size_v1_1 = 0;
+            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
+
+            
+
+            // v2 1  --
+            int *t_1 = NULL;
+            int *t1_1 = NULL;
+            int *s_1 = NULL;
+            int t_size_1 = 0;
+            int s_size_1 = 0;
+            minCapv2_1(weights, n, &t_1, &t1_1, &t_size_1, &s_1, &s_size_1, capacity, 1);
+
+            // puts("col 1:");
+            // printf("%d\n", s_size_v1_1);
+            // puts("col :");
+            // printf("%d\n", s_size_1);
+
+            for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
+                char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
+                strcat(instanceFilename, filesPath);
+                strcat(instanceFilename, allTypes[typeCount][i]);
+
+            // BINARYKNAPSACK ----
+                readValues_d_i(instanceFilename, &profits, &weights, &n);
+
+            //columOpt_prealloc  (micapv2)       -------------------------------------------------------------------------------------------
+                int *x2 = calloc(n, sizeof(int));
+                double **mat_ks2 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size, &mat_ks2);                                                  // alloc
+                end = clock();
+                double time_ks2_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
+                end = clock();
+                double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt = 0;                                                                  //res1
+                for(int k=0; k<n; k++)
+                    resOpt += x2[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2);                                                           // free
+
+            //columOpt_prealloc  (micapv2 + t')       -------------------------------------------------------------------------------------------
+                int *x2_1 = calloc(n, sizeof(int));
+                double **mat_ks2_1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_1, &mat_ks2_1);                                                  // alloc
+                end = clock();
+                double time_ks2_allocation_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_1, t_1, t1_1, s_size_1, s_1, mat_ks2_1, x2_1);  // ks
+                end = clock();
+                double time_ks2_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_1 = 0;                                                                  //res1
+                for(int k=0; k<n; k++)
+                    resOpt_1 += x2_1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_1);                                                           // free
+
+
+            //columOpt_prealloc_V1    (micapv1)      -------------------------------------------------------------------------------------------
+                int *x2_v1 = calloc(n, sizeof(int));
+                double **mat_ks2_v1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v1, &mat_ks2_v1);                                            //alloc
+                end = clock();
+                double time_ks2_v1_allocation = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
+                end = clock();
+                double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v1 = 0;                                                               //resv1
+                for(int k=0; k<n; k++)
+                    resOpt_v1 += x2_v1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_v1);
+
+            //columOpt_prealloc_V1    (micapv1 + t')      -------------------------------------------------------------------------------------------
+                int *x2_v1_1 = calloc(n, sizeof(int));
+                double **mat_ks2_v1_1 = NULL;
+
+                start = clock();
+                ks2_di_alloc(n, s_size_v1_1, &mat_ks2_v1_1);                                            //alloc
+                end = clock();
+                double time_ks2_v1_allocation_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                start = clock();
+                ks2_di_prealloc_1(profits, weights, capacity, n, t_size_v1_1, t_v1_1, t1_v1_1, s_size_v1_1, s_v1_1, mat_ks2_v1_1, x2_v1_1); //ks
+                end = clock();
+                double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+                double resOpt_v1_1 = 0;                                                               //resv1
+                for(int k=0; k<n; k++)
+                    resOpt_v1_1 += x2_v1_1[k]*profits[k];
+
+                ks2_di_free(n, &mat_ks2_v1_1);                                                      //free
+
+            // original                     -------------------------------------------------------------------------------------------
+                int *x_original = calloc(n, sizeof(int));
+
+                start = clock();
+                ks_d(profits, weights, capacity, n, x_original);                                   //ks
+                end = clock();
+                double time_original = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    // puts("time original:");
+    // printf("%f\n", time_original);
+    // puts("time 2:");
+    // printf("%f\n", time_ks2_v1_1);
+    // puts("time 3:");
+    // printf("%f\n", time_ks2_v1);
+    // puts("time 4:");
+    // printf("%f\n", time_ks2_1);
+    
+
+            //  -----------------------------------------------------------------------------------------------------------------------
+                printf("%s,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",allTypesNames[typeCount],s_size_v1,s_size,     s_size_v1_1,s_size_1,   time_ks2_allocation,time_ks2,   time_ks2_allocation_1,   time_ks2_1,   time_ks2_v1_allocation,time_ks2_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,time_original);
+
+            // free                         -------------------------------------------------------------------------------------------
+                free(x2);
+                free(x2_v1);
+                free(x_original);
+                free(x2_1);
+                free(x2_v1_1);
+                free(profits);
+                free(weights);
+            }
+
+            //free
+            free(t_v1);
+            free(s_v1);
+            free(s);
+            free(t);
+            free(s_v1_1);
+            free(t_v1_1);
+            free(t1_v1_1);
+            free(t_1);
+            free(t1_1);
+            free(s_1);
+        }
+    }
+    return 0;
+}
+
+
+int main_old(int argc, char *argv[]) {
+
+    if(argc < 3) {
+        printf("Please specify the pathname and the capacity of the knapsack:\nbinaryKnapsack2a generator/files/derived/int 100");
+        exit(EXIT_FAILURE);
+    }
+    int capacity = atoi(argv[2]);       //knapsack capacity
+    char* filesPath = argv[1];          //instances path
+
+    /* testmodes:
+        0: full (esecuzione di tutti gli algoritmi risolutivi)
+        1: optimized (esecuzione di tutti gli algoritmi con ottimizzazione delle colonne e fminknap)
+        2: column optimization (confronto della riduzione del numero delle colonne degli algoritmi di ottimizzazione delle colonne)
+        3: approximated (confronto con gli algoritmi approssimati con divisione dei pesi o esclusione delle colonne)
+        4: approximated column optimization (confronto della riduzione delle colonne con gli algoritmi approssimati)
+    */
+
+    int testmode = (argc > 3)? atoi(argv[3]):0;
+    int cut_threshold = (argc > 3)? atoi(argv[4]):1;
+    int division_value = (argc > 4)? atoi(argv[5]):1;
+
+    // printf("test: %d\n", testmode);
+    // printf("cut: %d\n", cut_threshold);
+    // printf("div: %d\n", division_value);
+
+    // instance types initialization ---
+    char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
+    int fileNr = getFilenames(filesPath, MAX_FILES, filenames);
+
+    char **uncorr = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t uncorrSize;
+    getFnmatch(filenames, uncorr, fileNr, &uncorrSize, "uncorr*");
+
+    char **alm = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t almSize;
+    getFnmatch(filenames, alm, fileNr, &almSize, "alm*");
+
+    char **inv = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t invSize;
+    getFnmatch(filenames, inv, fileNr, &invSize, "inv*");
+
+    char **str = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t strSize;
+    getFnmatch(filenames, str, fileNr, &strSize, "str*");
+
+    char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
+    size_t weakSize;
+    getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
+
+    char** allTypes[] = {uncorr, alm, inv, str, weak};
+    char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
+    size_t allTypesSizes[] = {uncorrSize, almSize, invSize, strSize, weakSize};
+    int typeCount = 0;
+    //---
+
+    // clock initialization ---
+
+    clock_t start, end;
+
+    // execution ---
+    if(testmode == 0){          // 0: full (esecuzione di tutti gli algoritmi risolutivi)
+        printf("type,capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size_v2,s_size_v2,mincap_v2_time,");
+        printf("t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,");
+        printf("mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,");
+        printf("time_original_prealloc,res_original_alloc,time_ks2_v2_allocation,time_ks2_v2,resOpt_v2,time_ks2_v1_allocation,");
+        printf("time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,");
+        printf("resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,time_ks2_v2_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin");
+        printf("\n");
+        for(;typeCount<5; typeCount++){
+            char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
+            strcat(instanceFilename0, filesPath);
+            strcat(instanceFilename0, allTypes[typeCount][0]);
+
+            // lettura di un'istanza
+            double *profits;
+            int *weights;
+            int n = 0;
+            readValues_d_i(instanceFilename0, &profits, &weights, &n);
+
+            ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
+
+            // divisione pesi per micapv1
+            // int *dividedWeights = calloc(n, sizeof(int));
+            // int currentWeight = 0;
+            // start = clock();
+            // for(int i=0; i<n; i++){
+            //     currentWeight = ceil(weights[i]/division_value);
+            //     dividedWeights[i] = (currentWeight>0)?currentWeight:1;
+            // }
+            // end = clock();
+            // double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;;
+
+            // v1   --
+            int *t_v1 = NULL;
+            int *s_v1 = NULL;
+            int t_size_v1 = 0;
+            int s_size_v1 = 0;
+            start = clock();
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
             end = clock();
             double mincap_v1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
@@ -1773,7 +2547,7 @@ int main(int argc, char *argv[]) {
             minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, 1);
             end = clock();
             double mincap_v2_time = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
             // v1 t'  --
             int *t_v1_1 = NULL;
             int *t1_v1_1 = NULL;
@@ -1781,7 +2555,7 @@ int main(int argc, char *argv[]) {
             int t_size_v1_1 = 0;
             int s_size_v1_1 = 0;
             start = clock();
-            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1,  &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);        
+            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1,  &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
             end = clock();
             double mincap_v1_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
@@ -1798,16 +2572,34 @@ int main(int argc, char *argv[]) {
             double mincap_v2_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
             // v1 div  --
+            // int *dividedWeights = NULL;
+            // int *t_v1_1_div = NULL;
+            // int *t1_v1_1_div = NULL;
+            // int *s_v1_1_div = NULL;
+            // int t_size_v1_1_div = 0;
+            // int s_size_v1_1_div = 0;
+            // start = clock();
+            // minCap_opt_1(dividedWeights, n/division_value, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity);
+            // end = clock();
+            // mincap_v1_1_div_time += ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            int *dividedWeights = NULL;
             int *t_v1_1_div = NULL;
             int *t1_v1_1_div = NULL;
             int *s_v1_1_div = NULL;
             int t_size_v1_1_div = 0;
             int s_size_v1_1_div = 0;
+            int dividedCapacity = 0;
             start = clock();
-            minCap_opt_1(dividedWeights, n/division_value, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity);        
+            minCap_opt_1_divided(weights, &dividedWeights, n, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity, &dividedCapacity, division_value);
             end = clock();
-            mincap_v1_1_div_time += ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+            double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // puts("s_size cut");
+            // printf("%d\n",s_size_v1_1_div);
+            // puts("s_size");
+            // printf("%d\n",s_size_v1_1);
+
             // v2 cut  --
             int *t_v2_1_cut = NULL;
             int *t1_v2_1_cut = NULL;
@@ -1820,12 +2612,12 @@ int main(int argc, char *argv[]) {
             end = clock();
             double mincap_v2_1_cut_time = ((double) (end - start)) / CLOCKS_PER_SEC;
             ////----------------------------------------------------------------------------------------------
-            
+
             for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -1852,7 +2644,7 @@ int main(int argc, char *argv[]) {
                 end = clock();
                 double time_original_prealloc = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double res_original_alloc = 0;                                                               //resv1 
+                double res_original_alloc = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     res_original_alloc += x_original_alloc[k]*profits[k];
 
@@ -1876,7 +2668,7 @@ int main(int argc, char *argv[]) {
                 for(int k=0; k<n; k++)
                     resOpt += x2[k]*profits[k];
 
-                ks2_di_free(n, &mat_ks2);  
+                ks2_di_free(n, &mat_ks2);
                                                                          // free
             //columOpt_prealloc_V1    (micapv1)      -------------------------------------------------------------------------------------------
                 int *x2_v1 = calloc(n, sizeof(int));
@@ -1892,12 +2684,12 @@ int main(int argc, char *argv[]) {
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1 = 0;                                                               //resv1 
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
-                ks2_di_free(n, &mat_ks2_v1);  
-                                                               
+                ks2_di_free(n, &mat_ks2_v1);
+
             //columOpt_prealloc_V1    (micapv1 + t')      -------------------------------------------------------------------------------------------
                 int *x2_v1_1 = calloc(n, sizeof(int));
                 double **mat_ks2_v1_1 = NULL;
@@ -1912,7 +2704,7 @@ int main(int argc, char *argv[]) {
                 end = clock();
                 double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1_1 = 0;                                                               //resv1 
+                double resOpt_v1_1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1_1 += x2_v1_1[k]*profits[k];
 
@@ -1948,11 +2740,11 @@ int main(int argc, char *argv[]) {
                 double time_ks2_v1_allocation_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
 
                 start = clock();
-                ks2_di_prealloc(profits, dividedWeights, capacity, n, t_size_v1_1_div, t_v1_1_div, s_size_v1_1_div, s_v1_1_div, mat_ks2_v1_1_div, x2_v1_1_div); //ks
+                ks2_di_prealloc(profits, dividedWeights, dividedCapacity, n, t_size_v1_1_div, t_v1_1_div, s_size_v1_1_div, s_v1_1_div, mat_ks2_v1_1_div, x2_v1_1_div); //ks
                 end = clock();
                 double time_ks2_v1_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1_1_div = 0;                                                               //resv1 
+                double resOpt_v1_1_div = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1_1_div += x2_v1_1_div[k]*profits[k];
 
@@ -1989,9 +2781,9 @@ int main(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -2010,15 +2802,12 @@ int main(int argc, char *argv[]) {
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
 
-            //  -----------------------------------------------------------------------------------------------------------------------            
-                
+            //  -----------------------------------------------------------------------------------------------------------------------
+
                 //printf("    type,                    capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size_v2,s_size_v2,mincap_v2_time,t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,time_original_prealloc,res_original_alloc,time_ks2_v2_allocation,time_ks2_v2,resOpt_v2,time_ks2_v1_allocation,time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin");
                 //            "%s,                     %d,     %d,%f                   ,%d       ,%d       ,%f           ,%d       ,%d        ,%f           ,%d         ,%d         ,%f               ,%d        ,%d          ,%f             ,%d              ,%d            ,%f                  ,%d             ,%d              ,%f                 ,%f            ,%f                      ,%f                    ,%f               ,%f                     ,%f         ,%f       ,%f                    ,%f         ,%f       ,%f                      ,%f            ,%f         ,%f                      ,%f           ,%f          ,%f                        ,%f                ,%f             ,%f                       ,%f            ,%f                        ,%f                     ,%f            ,%f"
-                printf("%s,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",allTypesNames[typeCount],capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size,   s_size,   mincap_v2_time,t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,time_original_prealloc,res_original_alloc,time_ks2_allocation,   time_ks2   ,resOpt,   time_ks2_v1_allocation,time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin);
-                //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
-                //printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], time_original, time_ks2,              time_ks2_v1,              time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
-                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-            
+                printf("%s,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",allTypesNames[typeCount],capacity,n,mincap_v1_1_div_time,t_size_v1,s_size_v1,mincap_v1_time,t_size,   s_size,   mincap_v2_time,t_size_v1_1,s_size_v1_1,mincap_v1_1_time,t_size_v2_1,s_size_v2_1,mincap_v2_1_time,t_size_v1_1_div,s_size_v1_1_div,mincap_v1_1_div_time,t_size_v2_1_cut,s_size_v2_1_cut,mincap_v2_1_cut_time,time_original,time_original_allocation,time_original_prealloc,res_original_alloc,time_ks2_allocation,   time_ks2   ,resOpt,   time_ks2_v1_allocation,time_ks2_v1,resOpt_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,resOpt_v1_1,time_ks2_v2_allocation_1,time_ks2_v2_1,resOpt_v2_1,time_ks2_v1_allocation_1_div,time_ks2_v1_1_div,resOpt_v1_1_div,time_ks2_allocation_1_cut,time_ks2_v2_1_cut,resOpt_v2_1_cut,time_ks2_v1_nocol_noalloc,time_fminknap_allocation,time_fminknap,resFmin);
+
             // FREE                         -------------------------------------------------------------------------------------------
                 free(x_original);
                 free(x_original_alloc);
@@ -2057,7 +2846,7 @@ int main(int argc, char *argv[]) {
             free(s_v2_1_cut);
         }
     }else if(testmode == 1){    // 1: optimized (esecuzione di tutti gli algoritmi con ottimizzazione delle colonne e fminknap)
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
@@ -2065,19 +2854,19 @@ int main(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             // v2   --
             int *t = NULL;
@@ -2094,7 +2883,7 @@ int main(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -2111,7 +2900,7 @@ int main(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
                 end = clock();
                 double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
                 double resOpt = 0;                                                                  //res1
                 for(int k=0; k<n; k++)
                     resOpt += x2[k]*profits[k];
@@ -2131,8 +2920,8 @@ int main(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-                double resOpt_v1 = 0;                                                               //resv1 
+
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -2140,9 +2929,9 @@ int main(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -2157,8 +2946,8 @@ int main(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
-                
+            //  -----------------------------------------------------------------------------------------------------------------------
+
                 printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], 0.0, time_ks2, time_ks2_v1, 0.0, time_ks2_v1_allocation, 0.0, time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
 
                 //      1  2  3  4  5  6  7   8             1                 2              3                      4                         5              6          7       8
@@ -2175,7 +2964,7 @@ int main(int argc, char *argv[]) {
                 free(s_list);
             }
         }
-    
+
     }else if(testmode == 2){    // 2: column optimization (confronto della riduzione del numero delle colonne degli algoritmi di ottimizzazione delle colonne)
         printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
         for(;typeCount<5; typeCount++){
@@ -2184,13 +2973,13 @@ int main(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
@@ -2198,10 +2987,10 @@ int main(int argc, char *argv[]) {
             int s_size_v1 = 0;
 
             start = clock();
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
             end = clock();
             double mincap_time = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
             // v2   --
             int *t = NULL;
             int *s = NULL;
@@ -2220,22 +3009,22 @@ int main(int argc, char *argv[]) {
         }
 
     }else if(testmode == 3){    // 3: approximated (confronto con gli algoritmi approssimati con divisione dei pesi o esclusione delle colonne)
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_1,time_columOpt_prealloc_V1,time_columOpt_prealloc_V1_1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-        
-        //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_1,time_columOpt_prealloc_V1,time_columOpt_prealloc_V1_1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
+
+        //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // divisione pesi per micapv1
             int *dividedWeights = calloc(n, sizeof(int));
             int value = 0;
@@ -2248,7 +3037,7 @@ int main(int argc, char *argv[]) {
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             // v2   --
             int *t = NULL;
@@ -2263,7 +3052,7 @@ int main(int argc, char *argv[]) {
             int *s_v1_1 = NULL;
             int t_size_v1_1 = 0;
             int s_size_v1_1 = 0;
-            minCap_opt_1(dividedWeights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);  
+            minCap_opt_1(dividedWeights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
 
             // v2 1  --
             int *t_1 = NULL;
@@ -2282,11 +3071,11 @@ int main(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 int *fakeWeights = NULL;
                 readValues_d_i(instanceFilename, &profits, &fakeWeights, &n);
-            
+
             //columOpt_prealloc             -------------------------------------------------------------------------------------------
                 int *x2 = calloc(n, sizeof(int));
                 double **mat_ks2 = NULL;
@@ -2300,7 +3089,7 @@ int main(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
                 end = clock();
                 double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
+
                 double resOpt = 0;                                                                  //res1
                 for(int k=0; k<n; k++)
                     resOpt += x2[k]*profits[k];
@@ -2320,7 +3109,7 @@ int main(int argc, char *argv[]) {
                 ks2_di_prealloc_1(profits, weights, capacity, n, t_size_1, t_1, t1_1, s_size_1, s_1, mat_ks2_1, x2_1);  // ks
                 end = clock();
                 double time_ks2_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
                 double resOpt_1 = 0;                                                                  //res1
                 for(int k=0; k<n; k++)
                     resOpt_1 += x2_1[k]*profits[k];
@@ -2340,8 +3129,8 @@ int main(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, dividedWeights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-                double resOpt_v1 = 0;                                                               //resv1 
+
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -2360,18 +3149,18 @@ int main(int argc, char *argv[]) {
                 ks2_di_prealloc_1(profits, dividedWeights, capacity, n, t_size_v1_1, t_v1_1, t1_v1_1, s_size_v1_1, s_v1_1, mat_ks2_v1_1, x2_v1_1); //ks
                 end = clock();
                 double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-                double resOpt_v1_1 = 0;                                                               //resv1 
+
+                double resOpt_v1_1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1_1 += x2_v1_1[k]*profits[k];
 
                 ks2_di_free(n, &mat_ks2_v1_1);                                                        //free
-            
+
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -2386,23 +3175,23 @@ int main(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
-                                                                     //printf("typename,                time_original,  time_columOpt_prealloc,   time_columOpt_prealloc_1, time_columOpt_prealloc_V1,time_columOpt_prealloc_V1_1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation, time_ks2_allocation, time_ks2_v1_allocation, time_ks2_allocation, time_ks2_v1_allocation, time_ks2_allocation, time_fminknap, resOpt_v1, resOpt, resFmin\n"); 
-                
+            //  -----------------------------------------------------------------------------------------------------------------------
+                                                                     //printf("typename,                time_original,  time_columOpt_prealloc,   time_columOpt_prealloc_1, time_columOpt_prealloc_V1,time_columOpt_prealloc_V1_1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation, time_ks2_allocation, time_ks2_v1_allocation, time_ks2_allocation, time_ks2_v1_allocation, time_ks2_allocation, time_fminknap, resOpt_v1, resOpt, resFmin\n");
+
                 printf("v1:%f, v1_1:%f, v2:%f, v2_1:%f; rv1=%f, rv1_1=%f, rv2=%f, rv2_1=%f, rfmin=%f\n", time_ks2_v1, time_ks2_v1_1, time_ks2, time_ks2_1, resOpt_v1, resOpt_v1_1, resOpt, resOpt_1, resFmin);
                 //printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], 0.0,           time_ks2,                 time_ks2_1,               time_ks2_v1,              time_ks2_v1_1,              0.0,                      time_ks2_v1_allocation, time_ks2_allocation, time_ks2_v1_allocation, time_ks2_allocation, time_ks2_v1_allocation, time_ks2_allocation, time_fminknap, resOpt_v1, resOpt, resFmin);
                 //      1  2  3  4  5  6  7   8             1                 2              3                      4                         5              6          7       8
                 //printf("%s,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], 0.0,           time_ks2,              time_ks2_v1,              time_fminknap, resOpt_v1, resOpt, resFmin);
                                         //printf("typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap, resOpt_v1, resOpt, resFmin\n");
             // FREE                         -------------------------------------------------------------------------------------------
-                
+
                 free(x2);
                 free(x2_v1);
                 free(x2_1);
                 free(x2_v1_1);
                 free(x);
                 free(profits);
-                
+
                 free(p_fminknap);
                 free(w_fminknap);
                 free(s_list);
@@ -2410,7 +3199,7 @@ int main(int argc, char *argv[]) {
             }
             free(weights);
         }
-    
+
     }else if(testmode == 4){    // 4: approximated column optimization (confronto della riduzione delle colonne con gli algoritmi approssimati)
         //printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,t_v1_div,t_v2_cut,s_v1_div,s_v2_cut,time_v1,time_v2,time_v1_div,time_v2_cut,ksv1_result_time\n"); //stai facendo qui
         printf("type,capacity,n,t_v1,t_v2,s_v1,s_v2,t_size_v1_div,t_size_v2_cut,s_sizev1_div,s_size_v2_cut,time_v1,time_v2,time_v1_div,time_v2_cut,time_original_prealloc,time_ks2_v1_1,time_ks2_v2_1,time_ks2_v1_1_div,time_ks2_v2_1_cut,res_original_alloc,resOpt_v1_1,resOpt_v2_1,resOpt_v1_1_div,resOpt_v2_1_cut\n");
@@ -2420,27 +3209,23 @@ int main(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // divisione pesi per micapv1
-            int *dividedWeights = calloc(n, sizeof(int));
-            int currentWeight = 0;
-            start = clock();
-            for(int i=0; i<n; i++){
-                currentWeight = ceil(weights[i]/division_value);
-                dividedWeights[i] = (currentWeight>0)?currentWeight:1;
-            }
+            // int *dividedWeights = calloc(n, sizeof(int));
+            // int currentWeight = 0;
+            // start = clock();
             // for(int i=0; i<n; i++){
-            //     currentWeight = ceil(weights[i]*division_value);
-            //     dividedWeights[i] = (currentWeight>capacity)?currentWeight:capacity;
+            //     currentWeight = ceil(weights[i]/division_value);
+            //     dividedWeights[i] = (currentWeight>0)?currentWeight:1;
             // }
-            end = clock();
-            double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;;
+            // end = clock();
+            // double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;;
 
             // v1   --
             int *t_v1_1 = NULL;
@@ -2449,7 +3234,7 @@ int main(int argc, char *argv[]) {
             int t_size_v1_1 = 0;
             int s_size_v1_1 = 0;
             start = clock();
-            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1,  &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);        
+            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1,  &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
             end = clock();
             double mincap_v1_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
@@ -2466,16 +3251,29 @@ int main(int argc, char *argv[]) {
             double mincap_v2_1_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
             // v1 div  --
+            // int *t_v1_1_div = NULL;
+            // int *t1_v1_1_div = NULL;
+            // int *s_v1_1_div = NULL;
+            // int t_size_v1_1_div = 0;
+            // int s_size_v1_1_div = 0;
+            // start = clock();
+            // minCap_opt_1(dividedWeights, n/division_value, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity);
+            // end = clock();
+            // mincap_v1_1_div_time += ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            int *dividedWeights = NULL;
             int *t_v1_1_div = NULL;
             int *t1_v1_1_div = NULL;
             int *s_v1_1_div = NULL;
             int t_size_v1_1_div = 0;
             int s_size_v1_1_div = 0;
+            int dividedCapacity = 0;
             start = clock();
-            minCap_opt_1(dividedWeights, n/division_value, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity);        
+            minCap_opt_1_divided(weights, &dividedWeights, n, &t_v1_1_div, &t1_v1_1_div,  &t_size_v1_1_div, &s_v1_1_div, &s_size_v1_1_div, capacity, &dividedCapacity, division_value);
             end = clock();
-            mincap_v1_1_div_time += ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+            double mincap_v1_1_div_time = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+
             // puts("div??");
             // printf("%d  ...  %d\n", s_size_v1_1, s_size_v1_1_div);
             // puts("divided weights:");
@@ -2497,12 +3295,12 @@ int main(int argc, char *argv[]) {
             end = clock();
             double mincap_v2_1_cut_time = ((double) (end - start)) / CLOCKS_PER_SEC;
             ////----------------------------------------------------------------------------------------------
-            
+
             for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -2513,11 +3311,11 @@ int main(int argc, char *argv[]) {
                 ks_d_alloc(n, capacity, &mat_original);
 
                 start = clock();
-                ks_d_prealloc(profits, weights, capacity, n, mat_original, x_original_alloc);                                   //ks
+                ks_d_prealloc(profits, weights, capacity, n, mat_original, x_original_alloc);                //ks
                 end = clock();
                 double time_original_prealloc = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double res_original_alloc = 0;                                                               //resv1 
+                double res_original_alloc = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     res_original_alloc += x_original_alloc[k]*profits[k];
 
@@ -2539,7 +3337,7 @@ int main(int argc, char *argv[]) {
                 end = clock();
                 double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1_1 = 0;                                                               //resv1 
+                double resOpt_v1_1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1_1 += x2_v1_1[k]*profits[k];
 
@@ -2575,11 +3373,11 @@ int main(int argc, char *argv[]) {
                 double time_ks2_v1_allocation_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
 
                 start = clock();
-                ks2_di_prealloc(profits, dividedWeights, capacity, n, t_size_v1_1_div, t_v1_1_div, s_size_v1_1_div, s_v1_1_div, mat_ks2_v1_1_div, x2_v1_1_div); //ks
+                ks2_di_prealloc(profits, dividedWeights, dividedCapacity, n, t_size_v1_1_div, t_v1_1_div, s_size_v1_1_div, s_v1_1_div, mat_ks2_v1_1_div, x2_v1_1_div); //ks
                 end = clock();
                 double time_ks2_v1_1_div = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1_1_div = 0;                                                               //resv1 
+                double resOpt_v1_1_div = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1_1_div += x2_v1_1_div[k]*profits[k];
 
@@ -2605,10 +3403,10 @@ int main(int argc, char *argv[]) {
 
                 ks2_di_free(n, &mat_ks2_1_cut);
 
-            
-                                                                              //               %s,                      %d,      %d,%d,        %d,            %d,          %d,          %d,              %d,                %d,              %d,              %f,               %f,                %f,                    %f,                 %f,                     %f,            %f,            %f,                %f,                %f,                %f,         %f,         %f,             %f"  
+
+                                                                              //               %s,                      %d,      %d,%d,        %d,            %d,          %d,          %d,              %d,                %d,              %d,              %f,               %f,                %f,                    %f,                 %f,                     %f,            %f,            %f,                %f,                %f,                %f,         %f,         %f,             %f"
                 //                                                                             printf("type,                    capacity,n, t_v1,      t_v2,          s_v1,        s_v2,        t_size_v1_div,   t_size_v2_cut,     s_sizev1_div,    s_size_v2_cut,   time_v1,          time_v2,           time_v1_div,          time_v2_cut,         time_original_prealloc, time_ks2_v1_1, time_ks2_v2_1, time_ks2_v1_1_div, time_ks2_v2_1_cut, res_original_alloc,resOpt_v1_1,resOpt_v2_1,resOpt_v1_1_div,resOpt_v2_1_cut\n");
-                printf("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount],capacity,n, t_size_v1_1, t_size_v2_1, s_size_v1_1, s_size_v2_1, t_size_v1_1_div, t_size_v2_1_cut,   s_size_v1_1_div, s_size_v2_1_cut, mincap_v1_1_time, mincap_v2_1_time,  mincap_v1_1_div_time, mincap_v2_1_cut_time,time_original_prealloc, time_ks2_v1_1, time_ks2_v2_1, time_ks2_v1_1_div, time_ks2_v2_1_cut, res_original_alloc,resOpt_v1_1,resOpt_v2_1,resOpt_v1_1_div,resOpt_v2_1_cut);
+               printf("%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount],capacity,n, t_size_v1_1, t_size_v2_1, s_size_v1_1, s_size_v2_1, t_size_v1_1_div, t_size_v2_1_cut,   s_size_v1_1_div, s_size_v2_1_cut, mincap_v1_1_time, mincap_v2_1_time,  mincap_v1_1_div_time, mincap_v2_1_cut_time,time_original_prealloc, time_ks2_v1_1, time_ks2_v2_1, time_ks2_v1_1_div, time_ks2_v2_1_cut, res_original_alloc,resOpt_v1_1,resOpt_v2_1,resOpt_v1_1_div,resOpt_v2_1_cut);
 
                 // free
                 free(x_original_alloc);
@@ -2634,9 +3432,9 @@ int main(int argc, char *argv[]) {
             free(t1_v2_1_cut);
             free(s_v2_1_cut);
 
-            
-        }   
-    
+
+        }
+
     }else if(testmode == 5){    // 5: confronto tempi di esecuzione tra column opt e t'
         printf("typename,s_size_v1,s_size_v2,s_size_v1_1,s_size_v2_1,time_ks2_allocation,time_ks2_v2,time_ks2_v2_allocation_1,time_ks2_v2_1,time_ks2_v1_allocation,time_ks2_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,time_original\n");
         for(;typeCount<5; typeCount++){
@@ -2645,19 +3443,19 @@ int main(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
-            
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
+
             // v2   --
             int *t = NULL;
             int *s = NULL;
@@ -2671,7 +3469,7 @@ int main(int argc, char *argv[]) {
             int *s_v1_1 = NULL;
             int t_size_v1_1 = 0;
             int s_size_v1_1 = 0;
-            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);  
+            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
 
             // v2 1  --
             int *t_1 = NULL;
@@ -2681,13 +3479,13 @@ int main(int argc, char *argv[]) {
             int s_size_1 = 0;
             minCapv2_1(weights, n, &t_1, &t1_1, &t_size_1, &s_1, &s_size_1, capacity, 1);
 
-            
+
          // printf(allTypesNames[typeCount],s_size_v1,s_size,     s_size_v1_1,s_size_1,   time_ks2_allocation,time_ks2,   time_ks2_allocation_1,   time_ks2_1,   time_ks2_v1_allocation,time_ks2_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,time_original);
             for(size_t i=0; i<allTypesSizes[typeCount] ; i++){
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -2746,12 +3544,12 @@ int main(int argc, char *argv[]) {
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1 = 0;                                                               //resv1 
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
-                ks2_di_free(n, &mat_ks2_v1);  
-                
+                ks2_di_free(n, &mat_ks2_v1);
+
             //columOpt_prealloc_V1    (micapv1 + t')      -------------------------------------------------------------------------------------------
                 int *x2_v1_1 = calloc(n, sizeof(int));
                 double **mat_ks2_v1_1 = NULL;
@@ -2766,7 +3564,7 @@ int main(int argc, char *argv[]) {
                 end = clock();
                 double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1_1 = 0;                                                               //resv1 
+                double resOpt_v1_1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1_1 += x2_v1_1[k]*profits[k];
 
@@ -2780,13 +3578,13 @@ int main(int argc, char *argv[]) {
                 end = clock();
                 double time_original = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-            //  -----------------------------------------------------------------------------------------------------------------------            
+            //  -----------------------------------------------------------------------------------------------------------------------
                 printf("%s,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",allTypesNames[typeCount],s_size_v1,s_size,     s_size_v1_1,s_size_1,   time_ks2_allocation,time_ks2,   time_ks2_allocation_1,   time_ks2_1,   time_ks2_v1_allocation,time_ks2_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,time_original);
 
                 //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
                 //printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], time_original, time_ks2,              time_ks2_v1,              time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
-                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-            
+                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
+
             // FREE                         -------------------------------------------------------------------------------------------
                 free(x2);
                 free(x2_v1);
@@ -2797,7 +3595,7 @@ int main(int argc, char *argv[]) {
                 free(weights);
 
                 //printf("%d,%d,%d,%d\n", t_size_v1, t_size, s_size_v1, s_size);
-            }            
+            }
             free(t_v1);
             free(s_v1);
             free(s);
@@ -2808,10 +3606,10 @@ int main(int argc, char *argv[]) {
             free(t_1);
             free(t1_1);
             free(s_1);
-            
+
         }
     }
-     
+
     return 0;
 }
 
@@ -2836,11 +3634,11 @@ int main____(int argc, char *argv[]) {
     int testmode = 0;
     int cut_threshold = 1;
     int division_value = 1;
-    
+
     // instance types initialization ---
     char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
     int fileNr = getFilenames(filesPath, MAX_FILES, filenames);
-    
+
     char **uncorr = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t uncorrSize;
     getFnmatch(filenames, uncorr, fileNr, &uncorrSize, "uncorr*");
@@ -2860,7 +3658,7 @@ int main____(int argc, char *argv[]) {
     char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t weakSize;
     getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
-    
+
     char** allTypes[] = {uncorr, alm, inv, str, weak};
     char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
     size_t allTypesSizes[] = {uncorrSize, almSize, invSize, strSize, weakSize};
@@ -2875,18 +3673,18 @@ int main____(int argc, char *argv[]) {
 
     if(testmode == 0){          // 0: full (esecuzione di tutti gli algoritmi risolutivi)
         //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
             //printf("ok");
 
@@ -2897,7 +3695,7 @@ int main____(int argc, char *argv[]) {
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             puts(" V2:");
             // v2   --
@@ -2907,7 +3705,7 @@ int main____(int argc, char *argv[]) {
             int s_size = 0;
             int threshold = 1;
             minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, threshold);
-            
+
             puts("weights");
             printa(weights, n);
             puts("t:");
@@ -2928,7 +3726,7 @@ int main____(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -2978,7 +3776,7 @@ int main____(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
+
                 puts("\nMat ks2 v1");
                 for(int k=0; k<n+1; k++){
                     for(int l=0; l<s_size_v1; l++){
@@ -2987,7 +3785,7 @@ int main____(int argc, char *argv[]) {
                     puts("");
                 }
 
-                double resOpt_v1 = 0;                                                               //resv1 
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -3018,9 +3816,9 @@ int main____(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -3035,12 +3833,12 @@ int main____(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
+            //  -----------------------------------------------------------------------------------------------------------------------
 
                 //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
                 //printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], time_original, time_ks2,              time_ks2_v1,              time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
-                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-            
+                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
+
             // FREE                         -------------------------------------------------------------------------------------------
                 free(x2);
                 free(x2_v1);
@@ -3056,7 +3854,7 @@ int main____(int argc, char *argv[]) {
         }
 
     }else if(testmode == 1){    // 1: optimized (esecuzione di tutti gli algoritmi con ottimizzazione delle colonne e fminknap)
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
@@ -3064,19 +3862,19 @@ int main____(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             // v2   --
             int *t = NULL;
@@ -3093,7 +3891,7 @@ int main____(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -3110,7 +3908,7 @@ int main____(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
                 end = clock();
                 double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
                 double resOpt = 0;                                                                  //res1
                 for(int k=0; k<n; k++)
                     resOpt += x2[k]*profits[k];
@@ -3130,8 +3928,8 @@ int main____(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-                double resOpt_v1 = 0;                                                               //resv1 
+
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -3139,9 +3937,9 @@ int main____(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -3156,8 +3954,8 @@ int main____(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
-                
+            //  -----------------------------------------------------------------------------------------------------------------------
+
                 printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], 0.0, time_ks2, time_ks2_v1, 0.0, time_ks2_v1_allocation, 0.0, time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
 
                 //      1  2  3  4  5  6  7   8             1                 2              3                      4                         5              6          7       8
@@ -3174,7 +3972,7 @@ int main____(int argc, char *argv[]) {
                 free(s_list);
             }
         }
-    
+
     }else if(testmode == 2){    // 2: column optimization (confronto della riduzione del numero delle colonne degli algoritmi di ottimizzazione delle colonne)
         printf("t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
         for(;typeCount<5; typeCount++){
@@ -3183,13 +3981,13 @@ int main____(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
@@ -3197,10 +3995,10 @@ int main____(int argc, char *argv[]) {
             int s_size_v1 = 0;
 
             start = clock();
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
             end = clock();
             double mincap_time = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
             // v2   --
             int *t = NULL;
             int *s = NULL;
@@ -3218,21 +4016,21 @@ int main____(int argc, char *argv[]) {
         }
 
     }else if(testmode == 3){    // 3: approximated (confronto con gli algoritmi approssimati con divisione dei pesi o esclusione delle colonne)
-        
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // divisione pesi per micapv1
             int *dividedWeights = calloc(n, sizeof(int));
             for(int i=0; i<n; i++) dividedWeights[i] = ceil(weights[i]/division_value);
@@ -3242,7 +4040,7 @@ int main____(int argc, char *argv[]) {
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             // v2   --
             int *t = NULL;
@@ -3258,12 +4056,12 @@ int main____(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 int *fakeWeights = NULL;
                 readValues_d_i(instanceFilename, &profits, &fakeWeights, &n);
                 free(fakeWeights);
-            
+
             //columOpt_prealloc             -------------------------------------------------------------------------------------------
                 int *x2 = calloc(n, sizeof(int));
                 double **mat_ks2 = NULL;
@@ -3277,7 +4075,7 @@ int main____(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
                 end = clock();
                 double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
                 double resOpt = 0;                                                                  //res1
                 for(int k=0; k<n; k++)
                     resOpt += x2[k]*profits[k];
@@ -3297,8 +4095,8 @@ int main____(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, dividedWeights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-                double resOpt_v1 = 0;                                                               //resv1 
+
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -3306,9 +4104,9 @@ int main____(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -3323,13 +4121,13 @@ int main____(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
+            //  -----------------------------------------------------------------------------------------------------------------------
 
                 //      1  2  3  4  5  6  7   8             1                 2              3                      4                         5              6          7       8
                 printf("%s,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], 0.0,           time_ks2,              time_ks2_v1,              time_fminknap, resOpt_v1, resOpt, resFmin);
                                         //printf("typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap, resOpt_v1, resOpt, resFmin\n");
             // FREE                         -------------------------------------------------------------------------------------------
-                
+
                 free(x2);
                 free(x2_v1);
                 free(x);
@@ -3340,7 +4138,7 @@ int main____(int argc, char *argv[]) {
                 free(s_list);
             }
         }
-    
+
     }else if(testmode == 4){    // 4: confronto del numero di colonne
         printf("t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
         for(;typeCount<5; typeCount++){
@@ -3349,13 +4147,13 @@ int main____(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // divisione pesi per micapv1
             int *dividedWeights = calloc(n, sizeof(int));
             for(int i=0; i<n; i++) dividedWeights[i] = ceil(weights[i]/division_value);
@@ -3366,7 +4164,7 @@ int main____(int argc, char *argv[]) {
             int t_size_v1 = 0;
             int s_size_v1 = 0;
             start = clock();
-            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
             end = clock();
             double mincap_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
@@ -3384,7 +4182,7 @@ int main____(int argc, char *argv[]) {
 
             printf("%d,%d,%d,%d,%f,%f\n", t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
         }
-    
+
     }else if(testmode == 5){    // 5: confronto tempi di esecuzione tra column opt e t'
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
@@ -3392,19 +4190,19 @@ int main____(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
-            
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
+
             // v2   --
             int *t = NULL;
             int *s = NULL;
@@ -3418,7 +4216,7 @@ int main____(int argc, char *argv[]) {
             int *s_v1_1 = NULL;
             int t_size_v1_1 = 0;
             int s_size_v1_1 = 0;
-            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);  
+            minCap_opt_1(weights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
 
             // v2 1  --
             int *t_1 = NULL;
@@ -3434,7 +4232,7 @@ int main____(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -3493,12 +4291,12 @@ int main____(int argc, char *argv[]) {
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1 = 0;                                                               //resv1 
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
-                ks2_di_free(n, &mat_ks2_v1);  
-                
+                ks2_di_free(n, &mat_ks2_v1);
+
             //columOpt_prealloc_V1    (micapv1 + t')      -------------------------------------------------------------------------------------------
                 int *x2_v1_1 = calloc(n, sizeof(int));
                 double **mat_ks2_v1_1 = NULL;
@@ -3513,7 +4311,7 @@ int main____(int argc, char *argv[]) {
                 end = clock();
                 double time_ks2_v1_1 = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-                double resOpt_v1_1 = 0;                                                               //resv1 
+                double resOpt_v1_1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1_1 += x2_v1_1[k]*profits[k];
 
@@ -3527,13 +4325,13 @@ int main____(int argc, char *argv[]) {
                 end = clock();
                 double time_original = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-            //  -----------------------------------------------------------------------------------------------------------------------            
+            //  -----------------------------------------------------------------------------------------------------------------------
                 printf("%s,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",allTypesNames[typeCount],s_size_v1,s_size,     s_size_v1_1,s_size_1,   time_ks2_allocation,time_ks2,   time_ks2_allocation_1,   time_ks2_1,   time_ks2_v1_allocation,time_ks2_v1,time_ks2_v1_allocation_1,time_ks2_v1_1,time_original);
 
                 //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
                 //printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], time_original, time_ks2,              time_ks2_v1,              time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
-                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-            
+                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
+
             // FREE                         -------------------------------------------------------------------------------------------
                 free(x2);
                 free(x2_v1);
@@ -3544,7 +4342,7 @@ int main____(int argc, char *argv[]) {
                 free(weights);
 
                 //printf("%d,%d,%d,%d\n", t_size_v1, t_size, s_size_v1, s_size);
-            }            
+            }
             free(t_v1);
             free(s_v1);
             free(s);
@@ -3555,10 +4353,10 @@ int main____(int argc, char *argv[]) {
             free(t_1);
             free(t1_1);
             free(s_1);
-            
+
         }
     }
-    
+
     return 0;
 }
 
@@ -3581,11 +4379,11 @@ int main__(int argc, char *argv[]) {
     int testmode = 0;
     int cut_threshold = 2;
     int division_value = 2;
-    
+
     // instance types initialization ---
     char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
     int fileNr = getFilenames(filesPath, MAX_FILES, filenames);
-    
+
     char **uncorr = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t uncorrSize;
     getFnmatch(filenames, uncorr, fileNr, &uncorrSize, "uncorr*");
@@ -3605,7 +4403,7 @@ int main__(int argc, char *argv[]) {
     char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t weakSize;
     getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
-    
+
     char** allTypes[] = {uncorr, alm, inv, str, weak};
     char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
     size_t allTypesSizes[] = {uncorrSize, almSize, invSize, strSize, weakSize};
@@ -3620,18 +4418,18 @@ int main__(int argc, char *argv[]) {
 
     if(testmode == 0){          // 0: full (esecuzione di tutti gli algoritmi risolutivi)
         //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             puts("Weights: ");
             printa(weights, n);
             puts("Divided weights: ");
@@ -3648,7 +4446,7 @@ int main__(int argc, char *argv[]) {
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             puts(" V2:");
             // v2   --
@@ -3658,7 +4456,7 @@ int main__(int argc, char *argv[]) {
             int s_size = 0;
             int threshold = 1;
             minCapv2(weights, n, &t, &t_size, &s, &s_size, capacity, threshold);
-            
+
             // puts("weights");
             // printa(weights, n);
             puts("t:");
@@ -3679,7 +4477,7 @@ int main__(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -3729,7 +4527,7 @@ int main__(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
+
                 puts("\nMat ks2 v1");
                 for(int k=0; k<n+1; k++){
                     for(int l=0; l<s_size_v1; l++){
@@ -3738,7 +4536,7 @@ int main__(int argc, char *argv[]) {
                     puts("");
                 }
 
-                double resOpt_v1 = 0;                                                               //resv1 
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -3769,9 +4567,9 @@ int main__(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -3786,12 +4584,12 @@ int main__(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
+            //  -----------------------------------------------------------------------------------------------------------------------
 
                 //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
                 //printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], time_original, time_ks2,              time_ks2_v1,              time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
-                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
-            
+                //printf("                          typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
+
             // FREE                         -------------------------------------------------------------------------------------------
                 free(x2);
                 free(x2_v1);
@@ -3807,7 +4605,7 @@ int main__(int argc, char *argv[]) {
         }
 
     }else if(testmode == 1){    // 1: optimized (esecuzione di tutti gli algoritmi con ottimizzazione delle colonne e fminknap)
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_ks2_v1_nocol_noalloc,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
@@ -3815,19 +4613,19 @@ int main__(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             // v2   --
             int *t = NULL;
@@ -3844,7 +4642,7 @@ int main__(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -3861,7 +4659,7 @@ int main__(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
                 end = clock();
                 double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
                 double resOpt = 0;                                                                  //res1
                 for(int k=0; k<n; k++)
                     resOpt += x2[k]*profits[k];
@@ -3881,8 +4679,8 @@ int main__(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-                double resOpt_v1 = 0;                                                               //resv1 
+
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -3890,9 +4688,9 @@ int main__(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -3907,8 +4705,8 @@ int main__(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
-                
+            //  -----------------------------------------------------------------------------------------------------------------------
+
                 printf("%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], 0.0, time_ks2, time_ks2_v1, 0.0, time_ks2_v1_allocation, 0.0, time_ks2_v1_allocation,time_ks2_allocation,time_ks2_v1_allocation,time_ks2_allocation,time_fminknap, resOpt_v1, resOpt, resFmin);
 
                 //      1  2  3  4  5  6  7   8             1                 2              3                      4                         5              6          7       8
@@ -3925,7 +4723,7 @@ int main__(int argc, char *argv[]) {
                 free(s_list);
             }
         }
-    
+
     }else if(testmode == 2){    // 2: column optimization (confronto della riduzione del numero delle colonne degli algoritmi di ottimizzazione delle colonne)
         printf("t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
         for(;typeCount<5; typeCount++){
@@ -3934,13 +4732,13 @@ int main__(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // v1   --
             int *t_v1 = NULL;
             int *s_v1 = NULL;
@@ -3948,10 +4746,10 @@ int main__(int argc, char *argv[]) {
             int s_size_v1 = 0;
 
             start = clock();
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
             end = clock();
             double mincap_time = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
             // v2   --
             int *t = NULL;
             int *s = NULL;
@@ -3969,21 +4767,21 @@ int main__(int argc, char *argv[]) {
         }
 
     }else if(testmode == 3){    // 3: approximated (confronto con gli algoritmi approssimati con divisione dei pesi o esclusione delle colonne)
-        
-        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n"); 
+
+        printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // divisione pesi per micapv1
             int *dividedWeights = calloc(n, sizeof(int));
             for(int i=0; i<n; i++) dividedWeights[i] = ceil(weights[i]/division_value);
@@ -3993,7 +4791,7 @@ int main__(int argc, char *argv[]) {
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
 
             // v2   --
             int *t = NULL;
@@ -4009,12 +4807,12 @@ int main__(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 int *fakeWeights = NULL;
                 readValues_d_i(instanceFilename, &profits, &fakeWeights, &n);
                 free(fakeWeights);
-            
+
             //columOpt_prealloc             -------------------------------------------------------------------------------------------
                 int *x2 = calloc(n, sizeof(int));
                 double **mat_ks2 = NULL;
@@ -4028,7 +4826,7 @@ int main__(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, weights, capacity, n, t_size, t, s_size, s, mat_ks2, x2);  // ks
                 end = clock();
                 double time_ks2 = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
                 double resOpt = 0;                                                                  //res1
                 for(int k=0; k<n; k++)
                     resOpt += x2[k]*profits[k];
@@ -4048,8 +4846,8 @@ int main__(int argc, char *argv[]) {
                 ks2_di_prealloc(profits, dividedWeights, capacity, n, t_size_v1, t_v1, s_size_v1, s_v1, mat_ks2_v1, x2_v1); //ks
                 end = clock();
                 double time_ks2_v1 = ((double) (end - start)) / CLOCKS_PER_SEC;
-                
-                double resOpt_v1 = 0;                                                               //resv1 
+
+                double resOpt_v1 = 0;                                                               //resv1
                 for(int k=0; k<n; k++)
                     resOpt_v1 += x2_v1[k]*profits[k];
 
@@ -4057,9 +4855,9 @@ int main__(int argc, char *argv[]) {
 
             // FMINKNAP                     -------------------------------------------------------------------------------------------
                 itype *p_fminknap = NULL;              //profitti
-                itype *w_fminknap = NULL;              //pesi 
+                itype *w_fminknap = NULL;              //pesi
                 int *x = calloc(n, sizeof(int));       //solution vector
-                SolutionList *s_list = NULL;           
+                SolutionList *s_list = NULL;
                 //int z = 0;                      //optimal objective value
 
                 readitypeValues(instanceFilename, &p_fminknap, &w_fminknap, &n);
@@ -4074,13 +4872,13 @@ int main__(int argc, char *argv[]) {
                 double resFmin = 0;                                                                 //resFmin
                 for(int k=0; k<n; k++)
                     resFmin += x[k]*profits[k];
-            //  -----------------------------------------------------------------------------------------------------------------------            
+            //  -----------------------------------------------------------------------------------------------------------------------
 
                 //      1  2  3  4  5  6  7   8             1                 2              3                      4                         5              6          7       8
                 printf("%s,%f,%f,%f,%f,%f,%f,%f\n", allTypesNames[typeCount], 0.0,           time_ks2,              time_ks2_v1,              time_fminknap, resOpt_v1, resOpt, resFmin);
                                         //printf("typename,                 time_original, time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap, resOpt_v1, resOpt, resFmin\n");
             // FREE                         -------------------------------------------------------------------------------------------
-                
+
                 free(x2);
                 free(x2_v1);
                 free(x);
@@ -4091,7 +4889,7 @@ int main__(int argc, char *argv[]) {
                 free(s_list);
             }
         }
-    
+
     }else if(testmode==4){
         printf("t_v1,t_v2,s_v1,s_v2,time_v1,time_v2\n");
         for(;typeCount<5; typeCount++){
@@ -4100,13 +4898,13 @@ int main__(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
-            
+
             // divisione pesi per micapv1
             int *dividedWeights = calloc(n, sizeof(int));
             for(int i=0; i<n; i++) dividedWeights[i] = ceil(weights[i]/division_value);
@@ -4117,7 +4915,7 @@ int main__(int argc, char *argv[]) {
             int t_size_v1 = 0;
             int s_size_v1 = 0;
             start = clock();
-            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
+            minCap_opt(dividedWeights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
             end = clock();
             double mincap_time = ((double) (end - start)) / CLOCKS_PER_SEC;
 
@@ -4135,9 +4933,9 @@ int main__(int argc, char *argv[]) {
 
             printf("%d,%d,%d,%d,%f,%f\n", t_size_v1, t_size, s_size_v1, s_size, mincap_time, mincapv2_time);
         }
-    
+
     }
-    
+
     return 0;
 }
 
@@ -4158,11 +4956,11 @@ int main1(int argc, char *argv[]) {
         4: approximated column optimization (confronto della riduzione delle colonne con gli algoritmi approssimati)
     */
 
-    
+
     // instance types initialization ---
     char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
     int fileNr = getFilenames(filesPath, MAX_FILES, filenames);
-    
+
     char **uncorr = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t uncorrSize;
     getFnmatch(filenames, uncorr, fileNr, &uncorrSize, "uncorr*");
@@ -4182,7 +4980,7 @@ int main1(int argc, char *argv[]) {
     char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t weakSize;
     getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
-    
+
     char** allTypes[] = {uncorr, alm, inv, str, weak};
     char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
     size_t allTypesSizes[] = {uncorrSize, almSize, invSize, strSize, weakSize};
@@ -4202,11 +5000,11 @@ int main1(int argc, char *argv[]) {
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
             int testmode = 0;
             int cut_threshold = 2;
@@ -4230,8 +5028,8 @@ int main1(int argc, char *argv[]) {
             int *s_v1 = NULL;
             int t_size_v1 = 0;
             int s_size_v1 = 0;
-            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);        
-            
+            minCap_opt(weights, n, &t_v1, &t_size_v1, &s_v1, &s_size_v1, capacity);
+
             puts("v1:");
             printf("s_size: %d\n", s_size_v1);
             printa(s_v1, s_size_v1);
@@ -4253,7 +5051,7 @@ int main1(int argc, char *argv[]) {
             int *s_v1_1 = NULL;
             int t_size_v1_1 = 0;
             int s_size_v1_1 = 0;
-            minCap_opt_1(dividedWeights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);  
+            minCap_opt_1(dividedWeights, n, &t_v1_1, &t1_v1_1, &t_size_v1_1, &s_v1_1, &s_size_v1_1, capacity);
 
 
             puts("v1 div:");
@@ -4289,10 +5087,10 @@ int main1(int argc, char *argv[]) {
             free(t_1);
             free(t1_1);
             free(s_1);
-            
+
         }
 
-    
+
     return 0;
 }
 
@@ -4324,7 +5122,7 @@ int main_ks(int argc, char *argv[]) {
     // instance types initialization ---
     char **filenames = (char**) malloc(MAX_FILES * sizeof(char*));
     int fileNr = getFilenames(filesPath, MAX_FILES, filenames);
-    
+
     char **uncorr = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t uncorrSize;
     getFnmatch(filenames, uncorr, fileNr, &uncorrSize, "uncorr*");
@@ -4344,7 +5142,7 @@ int main_ks(int argc, char *argv[]) {
     char **weak = (char**) malloc(MAX_INSTANCES * sizeof(char*));
     size_t weakSize;
     getFnmatch(filenames, weak, fileNr, &weakSize, "weak*");
-    
+
     char** allTypes[] = {uncorr, alm, inv, str, weak};
     char* allTypesNames[] = {"uncorr", "almost", "inv", "str", "weak"};
     size_t allTypesSizes[] = {uncorrSize, almSize, invSize, strSize, weakSize};
@@ -4358,18 +5156,18 @@ int main_ks(int argc, char *argv[]) {
     // execution ---
 
         //printf("typename,time_original,time_columOpt_prealloc,time_columOpt_prealloc_V1,time_fminknap,resOpt_v1,resOpt,resFmin\n");
-        printf("typename,time_original,time_original_prealloc\n"); 
+        printf("typename,time_original,time_original_prealloc\n");
         for(;typeCount<5; typeCount++){
             char instanceFilename0[MAX_INSTANCE_FILENAME_SIZE]="";
             strcat(instanceFilename0, filesPath);
             strcat(instanceFilename0, allTypes[typeCount][0]);
 
             // lettura di un'istanza
-            double *profits;               
+            double *profits;
             int *weights;
             int n = 0;
             readValues_d_i(instanceFilename0, &profits, &weights, &n);
-            
+
             ///--- Calcolo colonne ottimizzate  -------------------------------------------------------------------------------------------
             // printf("told:\nt: %d; s: %d\ntnew:\nt: %d; s:%d\n", t_size_v1, s_size_v1, t_size, s_size);
 
@@ -4377,7 +5175,7 @@ int main_ks(int argc, char *argv[]) {
                 char instanceFilename[MAX_INSTANCE_FILENAME_SIZE]="";
                 strcat(instanceFilename, filesPath);
                 strcat(instanceFilename, allTypes[typeCount][i]);
-                
+
             // BINARYKNAPSACK ----
                 readValues_d_i(instanceFilename, &profits, &weights, &n);
 
@@ -4399,15 +5197,15 @@ int main_ks(int argc, char *argv[]) {
                 ks_d_prealloc(profits, weights, capacity, n, mat_original, x_original_alloc);                                   //ks
                 end = clock();
                 double time_original_prealloc = ((double) (end - start)) / CLOCKS_PER_SEC;
-            
+
                 ks_d_free(n, &mat_original);
-            
-            //  -----------------------------------------------------------------------------------------------------------------------            
+
+            //  -----------------------------------------------------------------------------------------------------------------------
 
                 //      1  2  3  4  5  6  7   8             1                 2              3         4            5              6          7       8
                 printf("%s,%f,%f\n", allTypesNames[typeCount], time_original, time_original_prealloc);
-                //printf("typename,time_original\n"); 
-            
+                //printf("typename,time_original\n");
+
             // FREE                         -------------------------------------------------------------------------------------------
                 free(x_original);
                 free(profits);
